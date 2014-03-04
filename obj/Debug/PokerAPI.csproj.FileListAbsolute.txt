@@ -59,4 +59,15 @@ C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debu
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\DLL's\opencv_superres290.dll
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\DLL's\opencv_video290.dll
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\DLL's\opencv_videostab290.dll
-C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\obj\Debug\PokerAPI.PokerAPIWindow.resources
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Puma.Net.dll
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\puma.interop.dll
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\obj\Debug\PokerAPI.Testing.resources
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.cube.bigrams
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.cube.fold
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.cube.lm
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.cube.nn
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.cube.params
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.cube.size
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.cube.word-freq
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.tesseract_cube.nn
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\tessdata\eng.traineddata

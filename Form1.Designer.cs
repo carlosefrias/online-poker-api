@@ -1,6 +1,6 @@
 ﻿namespace PokerAPI
 {
-    partial class PokerAPIWindow
+    partial class Testing
     {
         /// <summary>
         /// Required designer variable.
@@ -32,6 +32,7 @@
             this.ibOriginal = new Emgu.CV.UI.ImageBox();
             this.buttonCaptureWindowFrame = new System.Windows.Forms.Button();
             this.txtMessage = new System.Windows.Forms.TextBox();
+            this.ReadTextButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ibOriginal)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,7 +48,7 @@
             // 
             this.buttonCaptureWindowFrame.Location = new System.Drawing.Point(17, 550);
             this.buttonCaptureWindowFrame.Name = "buttonCaptureWindowFrame";
-            this.buttonCaptureWindowFrame.Size = new System.Drawing.Size(158, 83);
+            this.buttonCaptureWindowFrame.Size = new System.Drawing.Size(158, 38);
             this.buttonCaptureWindowFrame.TabIndex = 4;
             this.buttonCaptureWindowFrame.Text = "Capture";
             this.buttonCaptureWindowFrame.UseVisualStyleBackColor = true;
@@ -64,17 +65,28 @@
             this.txtMessage.Size = new System.Drawing.Size(660, 83);
             this.txtMessage.TabIndex = 5;
             // 
-            // PokerAPIWindow
+            // ReadTextButton
+            // 
+            this.ReadTextButton.Location = new System.Drawing.Point(17, 594);
+            this.ReadTextButton.Name = "ReadTextButton";
+            this.ReadTextButton.Size = new System.Drawing.Size(158, 38);
+            this.ReadTextButton.TabIndex = 6;
+            this.ReadTextButton.Text = "Read Text";
+            this.ReadTextButton.UseVisualStyleBackColor = true;
+            this.ReadTextButton.Click += new System.EventHandler(this.ReadTextButton_Click);
+            // 
+            // Testing
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(855, 649);
+            this.Controls.Add(this.ReadTextButton);
             this.Controls.Add(this.txtMessage);
             this.Controls.Add(this.buttonCaptureWindowFrame);
             this.Controls.Add(this.ibOriginal);
             this.Font = new System.Drawing.Font("Lucida Sans", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Name = "PokerAPIWindow";
-            this.Text = "PokerAPI Window";
+            this.Name = "Testing";
+            this.Text = "Calculadora";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.ibOriginal)).EndInit();
             this.ResumeLayout(false);
@@ -87,6 +99,7 @@
         private Emgu.CV.UI.ImageBox ibOriginal;
         private System.Windows.Forms.Button buttonCaptureWindowFrame;
         private System.Windows.Forms.TextBox txtMessage;
+        private System.Windows.Forms.Button ReadTextButton;
     }
 }
 

@@ -16,7 +16,7 @@ namespace PokerAPI
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new PokerAPIWindow());
+            Application.Run(new Testing());
         }
     }
 }
