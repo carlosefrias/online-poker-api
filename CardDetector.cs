@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.OCR;
 using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,30 @@ namespace PokerAPI
     {
         //Class members
         private bool DEBUG = true;
-        private const double MIN_TMPLT_MATCHING = 0.95;
+        private const double MIN_TMPLT_MATCHING = 0.90;
+        private const double MIN_TMPLT_MATCHING_CORNER = 0.97;
 
         private Card[] allCards = new Card[52];
         private MCvBox2D tableCardRegion = new MCvBox2D();
+        private MCvBox2D holeCardsRegion = new MCvBox2D();
+        private MCvBox2D[] holeCardsRegions = new MCvBox2D[9];
+        private MCvBox2D[] players = new MCvBox2D[9];
+        private int[] playerStacks = new int[9];
+        private MCvBox2D potRegion = new MCvBox2D();
         private Image<Bgr, Byte> comunitaryCardRegion;
-        private List<Card> comunitaryCards = new List<Card>();
-        private List<Card> comunitaryCardsMethod2 = new List<Card>();
-
+        private Image<Bgr, Byte> holeRegion;
+        private List<Card> comunitaryCardsM1 = new List<Card>();
+        private List<Card> comunitaryCardsM2 = new List<Card>();
+        private List<Card> holeCards = new List<Card>();
+        
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        public CardDetector(){
+            //Setting the pot default position
+            potRegion = new MCvBox2D(new PointF(515, 246), new SizeF(150, 22), 0);
+            loadPositions();
+        }
         /// <summary>
         /// Function that loads all card templates from disk
         /// </summary>
@@ -104,6 +121,61 @@ namespace PokerAPI
             }
         }
         /// <summary>
+        /// Method that loads from disc the saved locations os the table cards and hole cards of every player
+        /// </summary>
+        private void loadPositions() 
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader("TextFiles/tableCardsRegion.txt"))
+                {
+                    string line = sr.ReadToEnd();
+                    string[] words = line.Split(' ');
+                    tableCardRegion = makeBox(int.Parse(words[0]), int.Parse(words[1]), int.Parse(words[2]), int.Parse(words[3]));
+                }
+                using (StreamReader sr = new StreamReader("TextFiles/holeCardsRegion.txt"))
+                {
+                    string line;
+                    for (int i = 0; i < 9; i++)
+                    {
+                        line = sr.ReadLine();
+                        Console.WriteLine(line);
+                        string[] words = line.Split(' ');
+                        holeCardsRegions[i] = makeBox(int.Parse(words[0]), int.Parse(words[1]), int.Parse(words[2]), int.Parse(words[3]));
+                    }
+                }
+                using (StreamReader sr = new StreamReader("TextFiles/playersStacks.txt"))
+                {
+                    string line;
+                    for (int i = 0; i < 9; i++)
+                    {
+                        line = sr.ReadLine();
+                        Console.WriteLine(line);
+                        string[] words = line.Split(' ');
+                        players[i] = makeBox(int.Parse(words[0]), int.Parse(words[1]), int.Parse(words[2]), int.Parse(words[3]));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be read:");
+                Console.WriteLine(e.Message);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        private MCvBox2D makeBox(int x, int y, int width, int height) 
+        {
+            PointF center = new PointF(x + width / 2, y + height / 2);
+            return new MCvBox2D(center, new SizeF(width, height), 0);
+        }
+        /// <summary>
         /// Funtion that retrieves the rectangles tha contain a card in a poker table image
         /// </summary>
         /// <param name="img"></param>
@@ -164,6 +236,7 @@ namespace PokerAPI
             double y_region_min = Double.MaxValue;
             double y_region_max = Double.MinValue;
             double comp = 0.0;
+            CvInvoke.cvShowImage("*************", cropImage(img, tableCardRegion));
             foreach (MCvBox2D box in boxList)
             {
                 //Adjusting the card rectangles detected to be parallel to the axes
@@ -189,7 +262,7 @@ namespace PokerAPI
             x_region_max = x_region_min + 4 * 10 + comp * 5;
             PointF center_region = new PointF((float)((x_region_max + x_region_min) / 2.0), (float)((y_region_max + y_region_min) / 2.0));
             SizeF sizef_region = new SizeF((float)(x_region_max - x_region_min), (float)(y_region_max - y_region_min));
-            tableCardRegion = new MCvBox2D(center_region, sizef_region, 0);
+            //tableCardRegion = new MCvBox2D(center_region, sizef_region, 0);
 
             if (DEBUG)
             {
@@ -207,7 +280,7 @@ namespace PokerAPI
         /// <returns></returns>
         public Image<Bgr, Byte> detectTableCards(Image<Bgr, Byte> img) 
         {
-            emptyComunitaryCards();
+            emptyCards();
             List<MCvBox2D> boxlist = findRectangleContainingCard(img);
             //Retrieve all rectangles containing a card
             Image<Bgr, Byte> RectangleImage = img.Clone();
@@ -234,6 +307,7 @@ namespace PokerAPI
             //for all card templates
             foreach (Card card in allCards)
             {
+
                 //###########################FULL TEMPLATE MATCHING####################################
                 //resize the template
                 card.template.Resize(tmp_new_size.Width, tmp_new_size.Height, INTER.CV_INTER_CUBIC);
@@ -251,17 +325,17 @@ namespace PokerAPI
                     //Fill the card region with black
                     auxImage.Draw(rect, new Bgr(Color.Black), -1);
                     //print and save the card detected
-                    Console.WriteLine("detected card: " + card.ToString());
-                    comunitaryCards.Add(card);
+                    //Console.WriteLine("detected card: " + card.ToString());
+                    comunitaryCardsM1.Add(card);
                 }
 
                 //###########################CORNER TEMPLATE MATCHING##################################
                 card.cornerTemplate.Resize((int)(tmp_new_size.Width * (15.0 / 56.0)), (int)(tmp_new_size.Height * (36.0 / 79.0)), INTER.CV_INTER_CUBIC);
-                //Template match the template with the region containing the comunitary cards
+                //Template match the corner template with the region containing the comunitary cards
                 Image<Gray, float> comparationCornerImage = auxImage2.MatchTemplate(card.cornerTemplate, Emgu.CV.CvEnum.TM_TYPE.CV_TM_CCOEFF_NORMED);
                 comparationCornerImage.MinMax(out min, out max, out pointMin, out pointMax);
                 //If the max correlation exceds some minimum value
-                if (max[0] > MIN_TMPLT_MATCHING)
+                if (max[0] > MIN_TMPLT_MATCHING_CORNER)
                 {
                     Rectangle rect = new Rectangle(new Point(pointMax[0].X, pointMax[0].Y), new Size(card.cornerTemplate.Width, card.cornerTemplate.Height));
                     //mark the card in the image
@@ -269,11 +343,33 @@ namespace PokerAPI
                     //Fill the card region with black
                     auxImage.Draw(rect, new Bgr(Color.Black), -1);
                     //print and save the card detected
-                    Console.WriteLine("Corner detected card: " + card.ToString());
-                    comunitaryCardsMethod2.Add(card);
+                    Console.WriteLine("Communitary card detected: " + card.ToString());
+                    comunitaryCardsM2.Add(card);
+                }
+                
+                //HOLE CARDS DETECTION
+                holeRegion = cropImage(img, holeCardsRegions[0]);
+                //Template match the corner template with the region containing the hole cards
+                Image<Gray, float> comparationHoleImage = holeRegion.MatchTemplate(card.cornerTemplate, Emgu.CV.CvEnum.TM_TYPE.CV_TM_CCOEFF_NORMED);
+                comparationHoleImage.MinMax(out min, out max, out pointMin, out pointMax);
+                //If the max correlation exceds some minimum value
+                if (max[0] > MIN_TMPLT_MATCHING_CORNER)
+                {
+                    Rectangle rect = new Rectangle(new Point(pointMax[0].X, pointMax[0].Y), new Size(card.cornerTemplate.Width, card.cornerTemplate.Height));
+                    //mark the card in the image
+                    holeRegion.Draw(rect, new Bgr(Color.DarkGreen), 2);
+                    //Fill the card region with black
+                    holeRegion.Draw(rect, new Bgr(Color.Black), -1);
+                    //print and save the card detected
+                    Console.WriteLine("hole card detected: " + card.ToString());
+                    holeCards.Add(card);
                 }
             }
-            CvInvoke.cvShowImage("cartas detetadas", comunitaryCardRegion);
+            if (DEBUG)
+            {
+                CvInvoke.cvShowImage("cartas mão detetadas", holeRegion);
+                CvInvoke.cvShowImage("cartas comunitarias detetadas", comunitaryCardRegion);
+            }
             return comunitaryCardRegion;
         }
         /// <summary>
@@ -288,7 +384,67 @@ namespace PokerAPI
             Bitmap bmpImage = img.ToBitmap();
             Bitmap bmpCrop = img.ToBitmap().Clone(cropArea, bmpImage.PixelFormat);
             return new Image<Bgr, Byte>(bmpCrop);
-        }        
+        }
+        /// <summary>
+        /// Function to read each player stack value
+        /// </summary>
+        /// <param name="img"></param>
+        public void readPlayerStacks(Image<Bgr, Byte> img)
+        {
+            Image<Bgr, Byte> potImage = cropImage(img, potRegion);
+            if(DEBUG) CvInvoke.cvShowImage("pote", potImage);
+            Console.WriteLine("leitura do pote: " + OCR(potImage)[0]);
+            int player = 0;
+            //TODO: Ler o resto
+            foreach (MCvBox2D box in players)
+            {
+                Image<Bgr, Byte> image = cropImage(img, box);
+                if (DEBUG) CvInvoke.cvShowImage("player: " + player, image);
+                string[] recong = OCR(image);
+                //Console.WriteLine(recong[0]);
+                if(recong[0].Contains("AllIn"))
+                    Console.WriteLine("Player " + player + ": " + "All In");
+                else if (recong[0].Contains("DeFora"))
+                    Console.WriteLine("Player " + player + ": " + "De Fora");
+                else
+                {
+                    Console.WriteLine("Player " + player + ": " + int.Parse(recong[1]));
+                    playerStacks[player] = int.Parse(recong[1]);
+                }
+                player++;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
+        private string[] OCR(Image<Bgr, Byte> image)
+        {
+            Tesseract tess = new Tesseract("tessdata", "eng", Tesseract.OcrEngineMode.OEM_DEFAULT);
+            tess.Recognize(image);
+            //Console.WriteLine(tess.GetText());
+            string[] retorno = new string[2];
+            retorno[0] = tess.GetText();
+            tess.SetVariable("tessedit_char_whitelist", ".0123456789");
+            tess.Recognize(image);
+            //Console.WriteLine(tess.GetText());
+            retorno[1] = tess.GetText();
+            retorno[0] = clean(retorno[0]);
+            retorno[1] = clean(retorno[1]);
+            return retorno;
+        }
+        private string clean(string s) 
+        {
+            string r = "";
+            for (int i = 0; i < s.Length; i++) 
+            {
+                if (!". ,:;!*+'?".Contains(s.ElementAt(i)) && s.ElementAt(i)!= '\n')
+                    r += s.ElementAt(i);
+            }
+            return r;
+        }
+
         /// <summary>
         /// Getter of all card templates
         /// </summary>
@@ -300,10 +456,11 @@ namespace PokerAPI
         /// <summary>
         /// Funtion tha emptyes the comunitary cards
         /// </summary>
-        private void emptyComunitaryCards()
+        private void emptyCards()
         {
-            comunitaryCards = new List<Card>();
-            comunitaryCardsMethod2 = new List<Card>();
+            comunitaryCardsM1 = new List<Card>();
+            comunitaryCardsM2 = new List<Card>();
+            holeCards = new List<Card>();
         }
         /// <summary>
         /// Getter for the comunitary cards
@@ -311,7 +468,11 @@ namespace PokerAPI
         /// <returns></returns>
         public List<Card> getComunitaryCards()
         {
-            return comunitaryCards;
+            return comunitaryCardsM2;
+        }
+        public List<Card> getHoleCards() 
+        {
+            return holeCards;
         }
         /// <summary>
         /// Function used to store de card corner templates of all cards

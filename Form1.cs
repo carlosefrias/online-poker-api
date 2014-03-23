@@ -14,9 +14,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using System.Diagnostics;
 using MouseManipulator;
-using Puma.Net;
 using Emgu.CV.OCR;
-using System.IO;
 
 
 namespace PokerAPI
@@ -24,7 +22,7 @@ namespace PokerAPI
     public partial class Testing : Form
     {
         //Member objects
-        private bool pokerStars = true;
+        private bool pokerStars = false;
         private Capture capture = null;
         private Image<Bgr, Byte> imgOriginal;
         private IntPtr hWnd;
@@ -35,7 +33,7 @@ namespace PokerAPI
         public Testing()
         {
             InitializeComponent();
-            hWnd = WinGetHandle("No Limit Hold'em");
+            hWnd = WinGetHandle("No Limit Hold'em"); 
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -77,9 +75,13 @@ namespace PokerAPI
                     pokerStars = false;
                 }
             }
-            else imgOriginal = new Image<Bgr, byte>("Captures/img1.png");
+            else imgOriginal = new Image<Bgr, byte>("Captures/img8.png");
             Image<Bgr, byte> img = imgOriginal.Clone();
             
+            if (img.Size != new Size(1016,728))
+            {
+                img.Resize(1016, 728, INTER.CV_INTER_CUBIC);
+            }            
             cd = new CardDetector();
             cd.detectTableCards(img);
             
@@ -87,8 +89,28 @@ namespace PokerAPI
             txtMessage.Text = "";
             foreach(Card card in cd.getComunitaryCards())
             {
-                txtMessage.AppendText(card.ToString() + "\n");
+                txtMessage.AppendText(card.ToString() + ";");
             }
+            txtMessage.AppendText("\nHoleCards: ");
+            foreach (Card card in cd.getHoleCards())
+            {
+                txtMessage.AppendText(card.ToString() + ";");
+            }
+            cd.readPlayerStacks(img);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ReadTextButton_Click(object sender, EventArgs e)
+        {
+            /*
+            Tesseract tess = new Tesseract("tessdata", "eng", Tesseract.OcrEngineMode.OEM_DEFAULT);
+            Image<Bgr, Byte> image = new Image<Bgr, byte>("Captures/textoPT.png");
+            tess.Recognize(image);
+            Console.WriteLine(tess.GetText());
+            */
         }
         /// <summary>
         /// Function that retrieves the window IntPtr with a given name
@@ -108,63 +130,56 @@ namespace PokerAPI
             return hWnd;
         }
 
-        private void ReadTextButton_Click(object sender, EventArgs e)
+        private void tableCardsRegionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //Saving the image to disk
-            //ScreenCapture.CaptureWindowToFile(hWnd, "Captures/img.png", System.Drawing.Imaging.ImageFormat.Png);
-            //Reading the text in that image
-            
-            //string path = "Captures/teste7.jpg";
-            /*
-            PumaPage inputFile = new PumaPage("C:/Users/Carlos/Documents/Visual Studio 2012/Projects/PokerAPI/PokerAPI/bin/Debug/" + path);
-            inputFile.FileFormat = PumaFileFormat.TxtAscii;
-            inputFile.Language = PumaLanguage.English;
-            string txt = "";
-            int potValue = -1;
-            try
-            {
-                txt = inputFile.RecognizeToString();
-                Console.WriteLine(txt);
-                string[] words = txt.Split(' ', '\n');
-                foreach (string word in words) 
-                {
-                    try
-                    {
-                        potValue = Int32.Parse(word);
-                        Console.WriteLine(potValue);
-                    }
-                    catch (FormatException) 
-                    {
-                    }
-                }
-                txtMessage.Text = "O valor do pote é: " + potValue;
-                //txtMessage.Text = txt;
-            }
-            catch (RecognitionEngineException reqEx) 
-            {
-                txtMessage.Text = "Não consegue ler texto da imagem\n" + reqEx.Message;
-            }
-            inputFile.Dispose();
-            */
-            Bitmap bmp = new Bitmap(@"C:\temp\New Folder\dotnet\eurotext.tif");
-            Tesseract ocr = new Tesseract();
-            // ocr.SetVariable("tessedit_char_whitelist", "0123456789");
-            ocr.Init(@"C:\temp\tessdata", "eng", Tesseract.OcrEngineMode.OEM_CUBE_ONLY);
-            // List<tessnet2.Word> r1 = ocr.DoOCR(bmp, new Rectangle(792, 247, 130, 54));
-			//List<tessnet2.Word> r1 = ocr.DoOCR(bmp, Rectangle.Empty);
-			//int lc = tessnet2.Tesseract.LineCount(r1);
-            //Tesseract ocr = new Tesseract("tessdata", "eng", Tesseract.OcrEngineMode.OEM_TESSERACT_ONLY);
-            //Image img = Image.FromFile("C:/Users/Carlos/Documents/Visual Studio 2012/Projects/PokerAPI/PokerAPI/bin/Debug/" + path);
-            //ocr.Recognize(new Image<Bgr, Byte>(new Bitmap(img)));
-            //create OCR
-            //_ocr = new Tesseract();
-            //You can download more language definition data from
-            //http://code.google.com/p/tesseract-ocr/downloads/list
-            //Languages supported includes:
-            //Dutch, Spanish, German, Italian, French and English
-            //_ocr.Init("eng", false);
-            //ocr.Recognize(imgOriginal);
-            //txtMessage.Text = ocr.GetText();
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Dock = DockStyle.Fill;
+            pictureBox.Image = imgOriginal.ToBitmap();
+            pictureBox.Size = imgOriginal.Size;
+            Configure form = new Configure(pictureBox, "TextFiles/tableCardsRegion.txt", 0);
+            form.Controls.Add(pictureBox);
+            form.Size = pictureBox.Size;
+            form.ShowDialog();
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void holeCardsRegionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Dock = DockStyle.Fill;
+            pictureBox.Image = imgOriginal.ToBitmap();
+            pictureBox.Size = imgOriginal.Size;
+            Configure form = new Configure(pictureBox, "TextFiles/holeCardsRegion.txt", 1);
+            form.Controls.Add(pictureBox);
+            form.Size = pictureBox.Size;
+            form.ShowDialog();
+        }
+
+        private void playersStacksToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Dock = DockStyle.Fill;
+            pictureBox.Image = imgOriginal.ToBitmap();
+            pictureBox.Size = imgOriginal.Size;
+            Configure form = new Configure(pictureBox, "TextFiles/playersStacks.txt", 2);
+            form.Controls.Add(pictureBox);
+            form.Size = pictureBox.Size;
+            form.ShowDialog();
+        }
+
+        private void bottonsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PictureBox pictureBox = new PictureBox();
+            pictureBox.Dock = DockStyle.Fill;
+            pictureBox.Image = imgOriginal.ToBitmap();
+            pictureBox.Size = imgOriginal.Size;
+            Configure form = new Configure(pictureBox, "TextFiles/bottons.txt", 3);
+            form.Controls.Add(pictureBox);
+            form.Size = pictureBox.Size;
+            form.ShowDialog();
         }
     }
 }
