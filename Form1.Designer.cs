@@ -32,7 +32,7 @@
             this.ibOriginal = new Emgu.CV.UI.ImageBox();
             this.buttonCaptureWindowFrame = new System.Windows.Forms.Button();
             this.txtMessage = new System.Windows.Forms.TextBox();
-            this.ReadTextButton = new System.Windows.Forms.Button();
+            this.MoveMouseButton = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,9 +41,11 @@
             this.configureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tableCardsRegionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.holeCardsRegionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.playersStacksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bottonsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.captureAll = new System.Windows.Forms.Button();
+            this.dealerChipPositionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.ibOriginal)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -60,7 +62,7 @@
             // 
             this.buttonCaptureWindowFrame.Location = new System.Drawing.Point(17, 550);
             this.buttonCaptureWindowFrame.Name = "buttonCaptureWindowFrame";
-            this.buttonCaptureWindowFrame.Size = new System.Drawing.Size(158, 38);
+            this.buttonCaptureWindowFrame.Size = new System.Drawing.Size(77, 38);
             this.buttonCaptureWindowFrame.TabIndex = 4;
             this.buttonCaptureWindowFrame.Text = "Capture";
             this.buttonCaptureWindowFrame.UseVisualStyleBackColor = true;
@@ -74,18 +76,18 @@
             this.txtMessage.Name = "txtMessage";
             this.txtMessage.ReadOnly = true;
             this.txtMessage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtMessage.Size = new System.Drawing.Size(805, 83);
+            this.txtMessage.Size = new System.Drawing.Size(793, 83);
             this.txtMessage.TabIndex = 5;
             // 
-            // ReadTextButton
+            // MoveMouseButton
             // 
-            this.ReadTextButton.Location = new System.Drawing.Point(17, 594);
-            this.ReadTextButton.Name = "ReadTextButton";
-            this.ReadTextButton.Size = new System.Drawing.Size(158, 38);
-            this.ReadTextButton.TabIndex = 6;
-            this.ReadTextButton.Text = "Read Text";
-            this.ReadTextButton.UseVisualStyleBackColor = true;
-            this.ReadTextButton.Click += new System.EventHandler(this.ReadTextButton_Click);
+            this.MoveMouseButton.Location = new System.Drawing.Point(17, 594);
+            this.MoveMouseButton.Name = "MoveMouseButton";
+            this.MoveMouseButton.Size = new System.Drawing.Size(158, 38);
+            this.MoveMouseButton.TabIndex = 6;
+            this.MoveMouseButton.Text = "Read Text";
+            this.MoveMouseButton.UseVisualStyleBackColor = true;
+            this.MoveMouseButton.Click += new System.EventHandler(this.ReadTextButton_Click);
             // 
             // menuStrip1
             // 
@@ -134,7 +136,8 @@
             this.tableCardsRegionToolStripMenuItem,
             this.holeCardsRegionToolStripMenuItem,
             this.playersStacksToolStripMenuItem,
-            this.bottonsToolStripMenuItem});
+            this.bottonsToolStripMenuItem,
+            this.dealerChipPositionsToolStripMenuItem});
             this.configureToolStripMenuItem.Name = "configureToolStripMenuItem";
             this.configureToolStripMenuItem.Size = new System.Drawing.Size(72, 20);
             this.configureToolStripMenuItem.Text = "Configure";
@@ -142,16 +145,30 @@
             // tableCardsRegionToolStripMenuItem
             // 
             this.tableCardsRegionToolStripMenuItem.Name = "tableCardsRegionToolStripMenuItem";
-            this.tableCardsRegionToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.tableCardsRegionToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.tableCardsRegionToolStripMenuItem.Text = "Table cards region";
             this.tableCardsRegionToolStripMenuItem.Click += new System.EventHandler(this.tableCardsRegionToolStripMenuItem_Click);
             // 
             // holeCardsRegionToolStripMenuItem
             // 
             this.holeCardsRegionToolStripMenuItem.Name = "holeCardsRegionToolStripMenuItem";
-            this.holeCardsRegionToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.holeCardsRegionToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.holeCardsRegionToolStripMenuItem.Text = "Hole cards region";
             this.holeCardsRegionToolStripMenuItem.Click += new System.EventHandler(this.holeCardsRegionToolStripMenuItem_Click);
+            // 
+            // playersStacksToolStripMenuItem
+            // 
+            this.playersStacksToolStripMenuItem.Name = "playersStacksToolStripMenuItem";
+            this.playersStacksToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.playersStacksToolStripMenuItem.Text = "Players stacks";
+            this.playersStacksToolStripMenuItem.Click += new System.EventHandler(this.playersStacksToolStripMenuItem_Click);
+            // 
+            // bottonsToolStripMenuItem
+            // 
+            this.bottonsToolStripMenuItem.Name = "bottonsToolStripMenuItem";
+            this.bottonsToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.bottonsToolStripMenuItem.Text = "Buttons";
+            this.bottonsToolStripMenuItem.Click += new System.EventHandler(this.bottonsToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
@@ -159,26 +176,30 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
             this.aboutToolStripMenuItem.Text = "About";
             // 
-            // playersStacksToolStripMenuItem
+            // captureAll
             // 
-            this.playersStacksToolStripMenuItem.Name = "playersStacksToolStripMenuItem";
-            this.playersStacksToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.playersStacksToolStripMenuItem.Text = "Players stacks";
-            this.playersStacksToolStripMenuItem.Click += new System.EventHandler(this.playersStacksToolStripMenuItem_Click);
+            this.captureAll.Location = new System.Drawing.Point(100, 551);
+            this.captureAll.Name = "captureAll";
+            this.captureAll.Size = new System.Drawing.Size(75, 37);
+            this.captureAll.TabIndex = 8;
+            this.captureAll.Text = "Cap 2";
+            this.captureAll.UseVisualStyleBackColor = true;
+            this.captureAll.Click += new System.EventHandler(this.captureAll_Click);
             // 
-            // bottonsToolStripMenuItem
+            // dealerChipPositionsToolStripMenuItem
             // 
-            this.bottonsToolStripMenuItem.Name = "bottonsToolStripMenuItem";
-            this.bottonsToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.bottonsToolStripMenuItem.Text = "Bottons";
-            this.bottonsToolStripMenuItem.Click += new System.EventHandler(this.bottonsToolStripMenuItem_Click);
+            this.dealerChipPositionsToolStripMenuItem.Name = "dealerChipPositionsToolStripMenuItem";
+            this.dealerChipPositionsToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.dealerChipPositionsToolStripMenuItem.Text = "Dealer Chip Positions";
+            this.dealerChipPositionsToolStripMenuItem.Click += new System.EventHandler(this.dealerChipPositionsToolStripMenuItem_Click);
             // 
             // Testing
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(986, 649);
-            this.Controls.Add(this.ReadTextButton);
+            this.Controls.Add(this.captureAll);
+            this.Controls.Add(this.MoveMouseButton);
             this.Controls.Add(this.txtMessage);
             this.Controls.Add(this.buttonCaptureWindowFrame);
             this.Controls.Add(this.ibOriginal);
@@ -201,7 +222,7 @@
         private Emgu.CV.UI.ImageBox ibOriginal;
         private System.Windows.Forms.Button buttonCaptureWindowFrame;
         private System.Windows.Forms.TextBox txtMessage;
-        private System.Windows.Forms.Button ReadTextButton;
+        private System.Windows.Forms.Button MoveMouseButton;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem configureToolStripMenuItem;
@@ -213,6 +234,8 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem playersStacksToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem bottonsToolStripMenuItem;
+        private System.Windows.Forms.Button captureAll;
+        private System.Windows.Forms.ToolStripMenuItem dealerChipPositionsToolStripMenuItem;
     }
 }
 

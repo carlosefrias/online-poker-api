@@ -33,6 +33,9 @@ namespace PokerAPI
                 case 2:
                     MessageBox.Show(messagePlayerStacks[count]);
                     break;
+                case 3:
+                    MessageBox.Show(messageDealerPositions[count]);
+                    break;
                 default:
                     MessageBox.Show(messageButtons[count]);
                     break;
@@ -48,7 +51,6 @@ namespace PokerAPI
         private Point RectStartPoint;
         private Rectangle Rect = new Rectangle();
         private Brush selectionBrush = new SolidBrush(Color.FromArgb(128, 72, 145, 220));
-        private bool selectedRectangle = false;
         private int type;//0 - communitary cards; 1 - hole cards; 2 - stack values;
         private int count = 0;
         private string txt = "";
@@ -65,8 +67,7 @@ namespace PokerAPI
                                               "Select player5's hole cards region",
                                               "Select player6's hole cards region",
                                               "Select player7's hole cards region",
-                                              "Select player8's hole cards region",
-                                              "Select player9's hole cards region"};
+                                              "Select player8's hole cards region"};
         private string[] messagePlayerStacks = { "Select your stack region",
                                               "Select player1's stack region",
                                               "Select player2's stack region",
@@ -75,8 +76,16 @@ namespace PokerAPI
                                               "Select player5's stack region",
                                               "Select player6's stack region",
                                               "Select player7's stack region",
-                                              "Select player8's stack region",
-                                              "Select player9's stack region"};
+                                              "Select player8's stack region"};
+        private string[] messageDealerPositions = {"Select possible zone for the dealer chip if you're the dealer",
+                                                   "Select possible zone for the dealer chip if player 1 is the dealer",
+                                                   "Select possible zone for the dealer chip if player 2 is the dealer",
+                                                   "Select possible zone for the dealer chip if player 3 is the dealer",
+                                                   "Select possible zone for the dealer chip if player 4 is the dealer",
+                                                   "Select possible zone for the dealer chip if player 5 is the dealer",
+                                                   "Select possible zone for the dealer chip if player 6 is the dealer",
+                                                   "Select possible zone for the dealer chip if player 7 is the dealer",
+                                                   "Select possible zone for the dealer chip if player 8 is the dealer"};
         /// <summary>
         /// Method that detects the upper left corner of the selected rectangle
         /// </summary>
@@ -135,47 +144,34 @@ namespace PokerAPI
             switch (type) 
             {
                 case 0:
-                    if (!selectedRectangle)
-                    {
-                        txt = "" + Rect.X + " " + Rect.Y + " " + Rect.Size.Width + " " + Rect.Size.Height;
-                        saveToFile();
-                        this.Close();
-                        selectedRectangle = true;
-                    }
+                    txt = "" + Rect.X + " " + Rect.Y + " " + Rect.Size.Width + " " + Rect.Size.Height;
+                    saveToFile();
+                    this.Close();
                     break;
                 case 1:
-                    txt += "" + Rect.X + " " + Rect.Y + " " + Rect.Size.Width + " " + Rect.Size.Height + "\n";
-                    count++;
-                    if(count != 9) MessageBox.Show(messageHoleCards[count]);
-                    else
-                    {
-                        txt = txt.Substring(0, txt.Length - 1);
-                        saveToFile();
-                        this.Close();
-                    }
+                    processSelectedRectangle(messageHoleCards);
                     break;
                 case 2:
-                    txt += "" + Rect.X + " " + Rect.Y + " " + Rect.Size.Width + " " + Rect.Size.Height + "\n";
-                    count++;
-                    if(count !=9) MessageBox.Show(messagePlayerStacks[count]);
-                    else
-                    {
-                        txt = txt.Substring(0, txt.Length - 1);
-                        saveToFile();
-                        this.Close();
-                    }
+                    processSelectedRectangle(messagePlayerStacks);
+                    break;
+                case 3:
+                    processSelectedRectangle(messageDealerPositions);
                     break;
                 default:
-                    txt += "" + Rect.X + " " + Rect.Y + " " + Rect.Size.Width + " " + Rect.Size.Height + "\n";
-                    count++;
-                    if(count != 4) MessageBox.Show(messageButtons[count]);
-                    else
-                    {
-                        txt = txt.Substring(0, txt.Length - 1);
-                        saveToFile();
-                        this.Close();
-                    }
+                    processSelectedRectangle(messageButtons);
                     break;
+            }
+        }
+        private void processSelectedRectangle(string[] msg) 
+        {
+            txt += "" + Rect.X + " " + Rect.Y + " " + Rect.Size.Width + " " + Rect.Size.Height + "\n";
+            count++;
+            if (count != msg.Length) MessageBox.Show(msg[count]);
+            else
+            {
+                txt = txt.Substring(0, txt.Length - 1);
+                saveToFile();
+                this.Close();
             }
         }
         /// <summary>
