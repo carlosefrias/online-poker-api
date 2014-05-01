@@ -8,13 +8,13 @@ namespace PokerAPI
 {
     class Player
     {
-        public enum State { onGame, outGame, allIn }
+        public enum State {onGame, outGame, allIn}
         public enum Move { call, raise, fold}
         private int number, stack;
         private Card[] holeCards = new Card[2];
 
-        private Move lastMove;
-        private State presentState;
+        //private Move lastMove;
+        //private State presentState;
         private bool dealer, smallBlind, bigBlind;
         /// <summary>
         /// Constructor of class Player

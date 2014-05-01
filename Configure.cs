@@ -36,8 +36,10 @@ namespace PokerAPI
                 case 3:
                     MessageBox.Show(messageDealerPositions[count]);
                     break;
-                default:
+                case 4:
                     MessageBox.Show(messageButtons[count]);
+                    break;
+                default:
                     break;
             }
             pictureBox.MouseDown += new MouseEventHandler(pictureBox1_MouseDown);
@@ -58,7 +60,11 @@ namespace PokerAPI
         private string[] messageButtons = {"Select the fold button region",
                                            "Select the call button region",
                                            "Select the raise button region",
-                                           "Select the raise textbox region"};
+                                           "Select the raise textbox region",
+                                           "Select the min button region",
+                                           "Select the 1/2 button region",
+                                           "Select the pot button region",
+                                           "Select the máx button region"};
         private string[] messageHoleCards = { "Select your hole cards region",
                                               "Select player1's hole cards region",
                                               "Select player2's hole cards region",

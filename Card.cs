@@ -44,5 +44,67 @@ namespace PokerAPI
         public override string ToString() {
             return this.rank + " of " + this.suit;
         }
+        public string toStringShort() 
+        {
+            string s = "";
+            switch (this.rank) 
+            {  
+                case Rank.ace:
+                    s += "A";
+                    break;
+                case Rank.douce:
+                    s += 2;
+                    break;
+                case Rank.three:
+                    s += 3;
+                    break;
+                case Rank.four:
+                    s += 4;
+                    break;
+                case Rank.five:
+                    s += 5;
+                    break;
+                case Rank.six:
+                    s += 6;
+                    break;
+                case Rank.seven:
+                    s += 7;
+                    break;
+                case Rank.eight:
+                    s += 8;
+                    break;
+                case Rank.nine:
+                    s += 9;
+                    break;
+                case Rank.ten:
+                    s += 10;
+                    break;
+                case Rank.jack:
+                    s += "J";
+                    break;
+                case Rank.queen:
+                    s += "Q";
+                    break;
+                default:
+                    s += "K";
+                    break;
+            }
+            switch (this.suit) 
+            {
+                case Suit.clubs:
+                    s += "c";
+                    break;
+                case Suit.diamonds:
+                    s += "d";
+                    break;
+                case Suit.hearts:
+                    s += "h";
+                    break;
+                case Suit.spades:
+                    s += "s";
+                    break;
+            }
+            return s;
+        }
     }
 }

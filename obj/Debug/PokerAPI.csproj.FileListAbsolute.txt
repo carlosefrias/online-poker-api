@@ -55,10 +55,8 @@ C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debu
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Emgu.CV.UI.dll
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Emgu.CV.VideoStab.dll
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Emgu.Util.dll
-C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Puma.Net.dll
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\WindowsInput.dll
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\ZedGraph.dll
-C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\puma.interop.dll
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Emgu.CV.xml
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Emgu.CV.GPU.xml
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\Emgu.CV.ML.xml
@@ -73,3 +71,5 @@ C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\obj\Debu
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\obj\Debug\PokerAPI.Testing.resources
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\obj\Debug\PokerAPI.Properties.Resources.resources
 C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\obj\Debug\PokerAPI.csproj.GenerateResource.Cache
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\PokerLib.dll
+C:\Users\Carlos\documents\visual studio 2012\Projects\PokerAPI\PokerAPI\bin\Debug\PokerLib.pdb

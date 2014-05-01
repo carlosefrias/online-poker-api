@@ -27,7 +27,6 @@ namespace PokerAPI
         public MCvBox2D tableCardRegion = new MCvBox2D();
         private MCvBox2D[] holeCardsRegions = new MCvBox2D[9];
         private MCvBox2D[] dealerPossibleLocations = new MCvBox2D[9];
-        public static MCvBox2D[] buttonsRegions = new MCvBox2D[4];
         private MCvBox2D[] players = new MCvBox2D[9];
         public int[] playerStacks = new int[9];
         private MCvBox2D potRegion = new MCvBox2D();
@@ -143,7 +142,6 @@ namespace PokerAPI
                 }
                 readFile("TextFiles/holeCardsRegion.txt", holeCardsRegions, 9);
                 readFile("TextFiles/playersStacks.txt", players, 9);
-                readFile("TextFiles/buttons.txt", buttonsRegions, 4);
                 readFile("TextFiles/dealerPositions.txt", dealerPossibleLocations, 9);
             }
             catch (Exception e)
@@ -390,6 +388,28 @@ namespace PokerAPI
             }
             return -1;
         }
+        public bool buttonsVisible(Image<Bgr, Byte> img) 
+        {
+            Image<Bgr, Byte> region;
+            double[] min, max;
+            Point[] pointMin, pointMax;
+            MCvBox2D box = new MCvBox2D(new PointF(646, 662), new SizeF(311, 106), 0);
+            region = cropImage(img, box);
+            Image<Bgr, Byte> buttonTemplate = new Image<Bgr, Byte>("ButtonsTemplate/buttons.png");
+            //Template match the template with the region containing the comunitary cards
+            Image<Gray, float> comparationImage = region.MatchTemplate(buttonTemplate, Emgu.CV.CvEnum.TM_TYPE.CV_TM_CCOEFF_NORMED);
+            comparationImage.MinMax(out min, out max, out pointMin, out pointMax);
+            //If the max correlation exceds some minimum value
+            comparationImage.Dispose();
+            if (max[0] > MIN_TMPLT_MATCHING_DEALER)
+            {
+                Rectangle rect = new Rectangle(new Point(pointMax[0].X, pointMax[0].Y), new Size(buttonTemplate.Width, buttonTemplate.Height));
+                //mark the card in the image
+                region.Draw(rect, new Bgr(Color.Red), 2);
+                return true;
+            }
+            return false;
+        }
         /// <summary>
         /// Function that retrieves the cropped image within a specific rectangle
         /// </summary>
@@ -398,20 +418,21 @@ namespace PokerAPI
         /// <returns></returns>
         public Image<Bgr, Byte> cropImage(Image<Bgr, Byte> img, MCvBox2D cropBox)
         {
-            Rectangle cropArea = new Rectangle((int)(cropBox.center.X - cropBox.size.Width / 2), (int)(cropBox.center.Y - cropBox.size.Height / 2), (int)cropBox.size.Width, (int)cropBox.size.Height);
-            Bitmap bmpImage = img.ToBitmap();
-            Bitmap bmpCrop = new Bitmap(bmpImage);
+            Image<Bgr, Byte> image = null;
             try
             {
+                Rectangle cropArea = new Rectangle((int)(cropBox.center.X - cropBox.size.Width / 2), (int)(cropBox.center.Y - cropBox.size.Height / 2), (int)cropBox.size.Width, (int)cropBox.size.Height);
+                Bitmap bmpImage = img.ToBitmap();
+                Bitmap bmpCrop;
                 bmpCrop = bmpImage.Clone(cropArea, bmpImage.PixelFormat);
+                image = new Image<Bgr, Byte>(bmpCrop);
+                bmpCrop.Dispose();
+                bmpImage.Dispose();
             }
-            catch (OutOfMemoryException e) 
+            catch (Exception e) 
             {
-                bmpImage.Save("coiso.png");
+                Console.WriteLine("Execpção: OutOfMemoryException");
             }
-            Image<Bgr, Byte> image = new Image<Bgr, Byte>(bmpCrop);
-            bmpImage.Dispose();
-            bmpCrop.Dispose();
             return image;
         }
         /// <summary>
@@ -424,36 +445,39 @@ namespace PokerAPI
             foreach (MCvBox2D box in players)
             {
                 Image<Bgr, Byte> image = cropImage(img, box);
-                image = image.Resize(3.0, INTER.CV_INTER_CUBIC);
-                if (DEBUG) CvInvoke.cvShowImage("player: " + player, image);
-                string[] recong = OCR(image);
-                image.Dispose();
-                if (recong[0].Contains("AllIn"))
+                if (image != null)
                 {
-                    if (DEBUG) Console.WriteLine("Player " + player + ": " + "All In");
-                    playerStacks[player] = 0;
-                }
-                else if (recong[0].Contains("DeFora"))
-                {
-                    if (DEBUG) Console.WriteLine("Player " + player + ": " + "De Fora");
-                }
-                else
-                {
-                    try
+                    image = image.Resize(3.0, INTER.CV_INTER_CUBIC);
+                    if (DEBUG) CvInvoke.cvShowImage("player: " + player, image);
+                    string[] recong = OCR(image);
+                    image.Dispose();
+                    if (recong[0].Contains("AllIn"))
                     {
-                        if (DEBUG)
+                        if (DEBUG) Console.WriteLine("Player " + player + ": " + "All In");
+                        playerStacks[player] = 0;
+                    }
+                    else if (recong[0].Contains("DeFora"))
+                    {
+                        if (DEBUG) Console.WriteLine("Player " + player + ": " + "De Fora");
+                    }
+                    else
+                    {
+                        try
                         {
-                            Console.WriteLine("Player " + player + ": " + int.Parse(recong[1]));
+                            if (DEBUG)
+                            {
+                                Console.WriteLine("Player " + player + ": " + int.Parse(recong[1]));
+                            }
+                            playerStacks[player] = int.Parse(recong[1]);
                         }
-                        playerStacks[player] = int.Parse(recong[1]);
+                        catch (Exception e)
+                        {
+                            if (DEBUG)
+                                Console.WriteLine("Player " + player + ": " + recong[1]);
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        if (DEBUG) 
-                            Console.WriteLine("Player " + player + ": " + recong[1]);
-                    }
+                    player++;
                 }
-                player++;
             }
         }
         /// <summary>

@@ -62,8 +62,8 @@
     <Reference Include="Emgu.Util">
       <HintPath>D:\Emgu\emgucv-windows-universal-cuda 2.9.0.1922\bin\Emgu.Util.dll</HintPath>
     </Reference>
-    <Reference Include="Puma.Net">
-      <HintPath>D:\Program Files (x86)\Puma.NET\Assemblies\Puma.Net.dll</HintPath>
+    <Reference Include="PokerLib">
+      <HintPath>..\..\..\..\..\Dropbox\Carlos Frias\LIACC Pokerlib\liacc poker lib\PokerLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -85,6 +85,7 @@
     <Compile Include="Configure.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Example.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
