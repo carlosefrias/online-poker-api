@@ -154,14 +154,24 @@ namespace PokerLibTest
         {
             var game = Game.NoLimitHoldem2P;
             MatchState matchState = new MatchState(new State(0, game), 0);
+            /*
             matchState.state.HoleCards[0, 0] = LIACC.Poker.Cards.Card.AceDiamonds.Value;
             matchState.state.HoleCards[0, 1] = LIACC.Poker.Cards.Card.KingClubs.Value;
             matchState.state.BoardCards[0] = LIACC.Poker.Cards.Card.TwoClubs.Value;
             matchState.state.BoardCards[1] = LIACC.Poker.Cards.Card.TenSpades.Value;
             matchState.state.BoardCards[2] = LIACC.Poker.Cards.Card.TwoHearts.Value;
             matchState.state.BoardCards[3] = LIACC.Poker.Cards.Card.ThreeDiamonds.Value;
-            matchState.state.BoardCards[4] = LIACC.Poker.Cards.Card.AceSpades.Value;
+            matchState.state.BoardCards[4] = LIACC.Poker.Cards.Card.TenClubs.Value;
+             */
 
+            matchState.state.HoleCards[0, 0] = LIACC.Poker.Cards.Card.MakeCard("Ac");
+            matchState.state.HoleCards[0, 1] = LIACC.Poker.Cards.Card.MakeCard("Kc");
+            matchState.state.BoardCards[0] = LIACC.Poker.Cards.Card.MakeCard("Jc");
+            matchState.state.BoardCards[1] = LIACC.Poker.Cards.Card.MakeCard("Qc");
+            matchState.state.BoardCards[2] = LIACC.Poker.Cards.Card.MakeCard("Tc");
+            //matchState.state.BoardCards[3] = LIACC.Poker.Cards.Card.ThreeDiamonds.Value;
+            //matchState.state.BoardCards[4] = LIACC.Poker.Cards.Card.NineClubs.Value;
+            
             byte[] fullHand = new byte[]
             {
                 matchState.state.HoleCards[0, 0],
@@ -169,8 +179,8 @@ namespace PokerLibTest
                 matchState.state.BoardCards[0],
                 matchState.state.BoardCards[1],
                 matchState.state.BoardCards[2],
-                matchState.state.BoardCards[3],
-                matchState.state.BoardCards[4]
+                //matchState.state.BoardCards[3],
+                //matchState.state.BoardCards[4]
             };
 
             var holeCards = new byte[]
@@ -184,8 +194,8 @@ namespace PokerLibTest
                 fullHand[2],
                 fullHand[3],
                 fullHand[4],
-                fullHand[5],
-                fullHand[6],
+                //fullHand[5],
+                //fullHand[6],
             };
 
             //Importante!!!!!! Inicializar o random apenas uma vez em toda a aplicação!!!
@@ -204,7 +214,6 @@ namespace PokerLibTest
         {
             Example1();
             Example2();
-
         }*/
     }
 }

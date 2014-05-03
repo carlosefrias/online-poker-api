@@ -16,8 +16,10 @@ using System.Diagnostics;
 using MouseManipulator;
 using Emgu.CV.OCR;
 using System.Threading;
-using LIACC.Poker.Rules;
 using LIACC.Poker;
+using LIACC.Poker.Cards;
+using LIACC.Poker.Rules;
+using Action = LIACC.Poker.Action;
 
 namespace PokerAPI
 {
@@ -32,6 +34,8 @@ namespace PokerAPI
         private CardDetector cd = new CardDetector();
         private int[] oldValues = new int[9];
         private Player[] players = new Player[9];
+        private Random random;
+        private double probabilties = 0.0;
 
         public Testing()
         {
@@ -131,6 +135,7 @@ namespace PokerAPI
                 ComunitaryCard5.Text = "CC5";
                 CC5pictureBox.Image = null;
             }
+            handProbLabel.Text = "" + probabilties;
         }
         /// <summary>
         /// Handler for the button click events
@@ -285,7 +290,7 @@ namespace PokerAPI
             form.ShowDialog();
         }
 
-        private void captureAll_Click(object sender, EventArgs e)
+        private void runAgent_Click(object sender, EventArgs e)
         {
             Thread oThread = new Thread(new ThreadStart(this.RunThread));
             oThread.Start();
@@ -378,6 +383,9 @@ namespace PokerAPI
         // This method that will be called when the thread is started
         public void RunThread()
         {
+            //Importante!!!!!! Inicializar o random apenas uma vez em toda a aplicação!!!
+            random = new Random();
+
             bool myTurn = false, first = true, newGame = false;
             int dealer = -1, secondCount = 0, estado = -1, lastPlayerToMove = 0;
             Game game = new Game();
@@ -427,12 +435,20 @@ namespace PokerAPI
                                     while (j != i)
                                     {
                                         //A fazer call dos possiveis jogadores que fizeram call ou fold... ver isto...
-                                        matchState.state.doAction(game, new LIACC.Poker.Action(ActionType.Call, 0));
+                                        try
+                                        {
+                                            matchState.state.doAction(game, new LIACC.Poker.Action(ActionType.Call, 0));
+                                        }
+                                        catch (IndexOutOfRangeException e) { }
                                         j++;
                                         if (j == 10) j = 0;
                                     }
                                     lastPlayerToMove = i;
-                                    matchState.state.doAction(game, new LIACC.Poker.Action(ActionType.Raise, raise));
+                                    try
+                                    {
+                                        matchState.state.doAction(game, new LIACC.Poker.Action(ActionType.Raise, raise));
+                                    }
+                                    catch (IndexOutOfRangeException e) { }
                                 }
                                 Console.WriteLine("Player: " + i + " raised " + raise);
                                 appendTextBox("\nPlayer: " + i + " raised " + raise);
@@ -465,28 +481,48 @@ namespace PokerAPI
                     }
                     //Detect the comunitary cards
                     cd.detectTableCards(img);
-                    if (runningAgent) 
+                    if (runningAgent)
                     {
                         List<Card> holeCards = cd.getHoleCards();
+                        bool holeCardsConhecidas = (holeCards.ToArray().Length == 2);
                         //deves preencher informação sobre as cartas assim que as detetares:
                         //exemplo, as cartas do jogador 2 são Ás de ouros e Reis de Paus
-                        if (holeCards.ToArray().Length == 2)
+                        byte[] fullHand;
+                        byte[] holeCards1, boardCards1;
+                        if (holeCardsConhecidas)
                         {
                             matchState.state.HoleCards[0, 0] = LIACC.Poker.Cards.Card.MakeCard(holeCards.ElementAt(0).toStringShort());
                             matchState.state.HoleCards[0, 1] = LIACC.Poker.Cards.Card.MakeCard(holeCards.ElementAt(1).toStringShort());
+                            fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1] };
+                            holeCards1 = new byte[] { fullHand[0], fullHand[1] };
+                            boardCards1 = new byte[] { };
                         }
                         List<Card> boardCards = cd.getComunitaryCards();
-                        //preencher também as cartas em cada ronda
-                        //exemplo de River round
-                        if (boardCards.ToArray().Length >= 3)
+                        if (boardCards.ToArray().Length >= 3 && holeCardsConhecidas)
                         {
-                            matchState.state.BoardCards[0] = LIACC.Poker.Cards.Card.TwoClubs.Value;
-                            matchState.state.BoardCards[1] = LIACC.Poker.Cards.Card.TwoDiamonds.Value;
-                            matchState.state.BoardCards[2] = LIACC.Poker.Cards.Card.TwoHearts.Value;
+                            matchState.state.BoardCards[0] = LIACC.Poker.Cards.Card.MakeCard(boardCards[0].toStringShort());
+                            matchState.state.BoardCards[1] = LIACC.Poker.Cards.Card.MakeCard(boardCards[1].toStringShort());
+                            matchState.state.BoardCards[2] = LIACC.Poker.Cards.Card.MakeCard(boardCards[2].toStringShort());
+                            fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2] };
+                            holeCards1 = new byte[] { fullHand[0], fullHand[1] };
+                            boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4] };
                             if (boardCards.ToArray().Length == 4 || boardCards.ToArray().Length == 5)
-                                matchState.state.BoardCards[3] = LIACC.Poker.Cards.Card.TwoSpades.Value;
-                            if(boardCards.ToArray().Length  == 5)
-                                matchState.state.BoardCards[4] = LIACC.Poker.Cards.Card.AceSpades.Value;
+                            {
+                                matchState.state.BoardCards[3] = LIACC.Poker.Cards.Card.MakeCard(boardCards[3].toStringShort());
+                                fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2], matchState.state.BoardCards[3] };
+                                boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4], fullHand[5] };
+                                if (boardCards.ToArray().Length == 5)
+                                {
+                                    matchState.state.BoardCards[4] = LIACC.Poker.Cards.Card.MakeCard(boardCards[4].toStringShort());
+                                    fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2], matchState.state.BoardCards[3], matchState.state.BoardCards[4] };
+                                    boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4], fullHand[5], fullHand[6] };
+                                }
+                            }
+                            Console.WriteLine("Probabilidade da mão: ");
+                            Hand.PrintHand(fullHand);
+                            var prob = Hand.Equity(holeCards1, boardCards1, 1, game, random);
+                            probabilties = prob;
+                            Console.WriteLine(" é " + prob);
                         }
                     }
                     int state = printState(cd.getComunitaryCards().ToArray().Length);
@@ -499,12 +535,26 @@ namespace PokerAPI
                     cd.printComunitaryCards();
                     //Detect if it is my turn to play
                     myTurn = cd.buttonsVisible(img);
+                    //Here is Where the decision for the movements is taking plae
                     if (myTurn)
                     {
                         Console.WriteLine("my turn to play");
                         appendTextBox("my turn to play");
-                        //VirtualMouse1 vr = new VirtualMouse1(hWnd);
-                        //vr.call();
+                        VirtualMouse1 vr = new VirtualMouse1(hWnd);
+                        if (state == 0)
+                            vr.call();
+                        else
+                        {
+                            if (probabilties > 0.6)
+                            {
+                                vr.raise();
+                            }
+                            else if (probabilties > 0.3 && probabilties <= 0.6)
+                            {
+                                vr.call();
+                            }
+                            else vr.fold();
+                        }
                     }
                 }
                 if (newGame) 
@@ -548,17 +598,7 @@ namespace PokerAPI
                     game.FirstPlayer = GetFirstPlayerNoLimit(2, game.NumPlayers);
                     //preencher os valores iniciais de dinheiro de cada jogador. preencher em centimos
                     //jogador 0 tem 10 euros, jogador 1 tem 15 euros, jogador 2 tem 5 euros, jogador 3 tem 9.50 e jogador 4 tem 2 euros
-                    game.Stack = new[] {
-                           players[0].getStack(), 
-                           players[1].getStack(),
-                           players[2].getStack(), 
-                           players[3].getStack(),
-                           players[4].getStack(), 
-                           players[5].getStack(),
-                           players[6].getStack(), 
-                           players[7].getStack(),
-                           players[8].getStack()
-                    };
+                    game.Stack = new[] {players[0].getStack(), players[1].getStack(), players[2].getStack(), players[3].getStack(), players[4].getStack(), players[5].getStack(), players[6].getStack(), players[7].getStack(), players[8].getStack()};
 
                     //Inicar um state para o jogo. O argumento handid (1337) é só um identificador para o estado, podes colocar o que quiseres
                     //o argumento viewingPlayer (2) indica a posição na mesa do teu bot
@@ -571,11 +611,10 @@ namespace PokerAPI
                     newGame = false;
                     runningAgent = true;
                 }
-
                 //Sleep for one second
                 Thread.Sleep(1000);
                 secondCount++;
-                //To ensure that it does take long to detect again the table cards
+                //To ensure that it does not take long to detect again the table cards
                 if (secondCount == 3)
                 {
                     secondCount = 0;

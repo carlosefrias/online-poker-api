@@ -77,7 +77,7 @@ namespace PokerAPI
                     s += 9;
                     break;
                 case Rank.ten:
-                    s += 10;
+                    s += "T";
                     break;
                 case Rank.jack:
                     s += "J";

@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.buttonCaptureWindowFrame = new System.Windows.Forms.Button();
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,7 +41,7 @@
             this.bottonsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dealerChipPositionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.captureAll = new System.Windows.Forms.Button();
+            this.RunAgentButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.CC5pictureBox = new System.Windows.Forms.PictureBox();
             this.CC4pictureBox = new System.Windows.Forms.PictureBox();
@@ -70,6 +69,8 @@
             this.Player2Label = new System.Windows.Forms.Label();
             this.Player1Label = new System.Windows.Forms.Label();
             this.Player0Label = new System.Windows.Forms.Label();
+            this.handProbabilitiesLabel = new System.Windows.Forms.Label();
+            this.handProbLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CC5pictureBox)).BeginInit();
@@ -80,16 +81,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.HC2pictureBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.HC1pictureBox)).BeginInit();
             this.SuspendLayout();
-            // 
-            // buttonCaptureWindowFrame
-            // 
-            this.buttonCaptureWindowFrame.Location = new System.Drawing.Point(17, 224);
-            this.buttonCaptureWindowFrame.Name = "buttonCaptureWindowFrame";
-            this.buttonCaptureWindowFrame.Size = new System.Drawing.Size(77, 38);
-            this.buttonCaptureWindowFrame.TabIndex = 4;
-            this.buttonCaptureWindowFrame.Text = "Capture";
-            this.buttonCaptureWindowFrame.UseVisualStyleBackColor = true;
-            this.buttonCaptureWindowFrame.Click += new System.EventHandler(this.pauseResumeButton_Click);
             // 
             // txtMessage
             // 
@@ -197,18 +188,20 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
             this.aboutToolStripMenuItem.Text = "About";
             // 
-            // captureAll
+            // RunAgentButton
             // 
-            this.captureAll.Location = new System.Drawing.Point(104, 225);
-            this.captureAll.Name = "captureAll";
-            this.captureAll.Size = new System.Drawing.Size(75, 37);
-            this.captureAll.TabIndex = 8;
-            this.captureAll.Text = "Cap 2";
-            this.captureAll.UseVisualStyleBackColor = true;
-            this.captureAll.Click += new System.EventHandler(this.captureAll_Click);
+            this.RunAgentButton.Location = new System.Drawing.Point(17, 224);
+            this.RunAgentButton.Name = "RunAgentButton";
+            this.RunAgentButton.Size = new System.Drawing.Size(126, 37);
+            this.RunAgentButton.TabIndex = 8;
+            this.RunAgentButton.Text = "Run Agent";
+            this.RunAgentButton.UseVisualStyleBackColor = true;
+            this.RunAgentButton.Click += new System.EventHandler(this.runAgent_Click);
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.handProbLabel);
+            this.panel1.Controls.Add(this.handProbabilitiesLabel);
             this.panel1.Controls.Add(this.CC5pictureBox);
             this.panel1.Controls.Add(this.CC4pictureBox);
             this.panel1.Controls.Add(this.CC3pictureBox);
@@ -242,7 +235,7 @@
             // 
             // CC5pictureBox
             // 
-            this.CC5pictureBox.Location = new System.Drawing.Point(359, 135);
+            this.CC5pictureBox.Location = new System.Drawing.Point(335, 135);
             this.CC5pictureBox.Name = "CC5pictureBox";
             this.CC5pictureBox.Size = new System.Drawing.Size(32, 44);
             this.CC5pictureBox.TabIndex = 25;
@@ -250,7 +243,7 @@
             // 
             // CC4pictureBox
             // 
-            this.CC4pictureBox.Location = new System.Drawing.Point(318, 135);
+            this.CC4pictureBox.Location = new System.Drawing.Point(294, 135);
             this.CC4pictureBox.Name = "CC4pictureBox";
             this.CC4pictureBox.Size = new System.Drawing.Size(32, 44);
             this.CC4pictureBox.TabIndex = 24;
@@ -258,7 +251,7 @@
             // 
             // CC3pictureBox
             // 
-            this.CC3pictureBox.Location = new System.Drawing.Point(276, 135);
+            this.CC3pictureBox.Location = new System.Drawing.Point(252, 135);
             this.CC3pictureBox.Name = "CC3pictureBox";
             this.CC3pictureBox.Size = new System.Drawing.Size(32, 44);
             this.CC3pictureBox.TabIndex = 23;
@@ -266,7 +259,7 @@
             // 
             // CC2pictureBox
             // 
-            this.CC2pictureBox.Location = new System.Drawing.Point(236, 135);
+            this.CC2pictureBox.Location = new System.Drawing.Point(212, 135);
             this.CC2pictureBox.Name = "CC2pictureBox";
             this.CC2pictureBox.Size = new System.Drawing.Size(32, 44);
             this.CC2pictureBox.TabIndex = 22;
@@ -274,7 +267,7 @@
             // 
             // CC1pictureBox
             // 
-            this.CC1pictureBox.Location = new System.Drawing.Point(193, 135);
+            this.CC1pictureBox.Location = new System.Drawing.Point(169, 135);
             this.CC1pictureBox.Name = "CC1pictureBox";
             this.CC1pictureBox.Size = new System.Drawing.Size(32, 44);
             this.CC1pictureBox.TabIndex = 21;
@@ -282,7 +275,7 @@
             // 
             // HC2pictureBox
             // 
-            this.HC2pictureBox.Location = new System.Drawing.Point(318, 55);
+            this.HC2pictureBox.Location = new System.Drawing.Point(212, 55);
             this.HC2pictureBox.Name = "HC2pictureBox";
             this.HC2pictureBox.Size = new System.Drawing.Size(32, 44);
             this.HC2pictureBox.TabIndex = 20;
@@ -290,7 +283,7 @@
             // 
             // HC1pictureBox
             // 
-            this.HC1pictureBox.Location = new System.Drawing.Point(275, 55);
+            this.HC1pictureBox.Location = new System.Drawing.Point(169, 55);
             this.HC1pictureBox.Name = "HC1pictureBox";
             this.HC1pictureBox.Size = new System.Drawing.Size(32, 44);
             this.HC1pictureBox.TabIndex = 19;
@@ -299,7 +292,7 @@
             // ComunitaryCard5
             // 
             this.ComunitaryCard5.AutoSize = true;
-            this.ComunitaryCard5.Location = new System.Drawing.Point(356, 119);
+            this.ComunitaryCard5.Location = new System.Drawing.Point(332, 119);
             this.ComunitaryCard5.Name = "ComunitaryCard5";
             this.ComunitaryCard5.Size = new System.Drawing.Size(37, 16);
             this.ComunitaryCard5.TabIndex = 18;
@@ -308,7 +301,7 @@
             // ComunitaryCard4label
             // 
             this.ComunitaryCard4label.AutoSize = true;
-            this.ComunitaryCard4label.Location = new System.Drawing.Point(313, 119);
+            this.ComunitaryCard4label.Location = new System.Drawing.Point(289, 119);
             this.ComunitaryCard4label.Name = "ComunitaryCard4label";
             this.ComunitaryCard4label.Size = new System.Drawing.Size(37, 16);
             this.ComunitaryCard4label.TabIndex = 17;
@@ -317,7 +310,7 @@
             // ComunitaryCard3Label
             // 
             this.ComunitaryCard3Label.AutoSize = true;
-            this.ComunitaryCard3Label.Location = new System.Drawing.Point(275, 119);
+            this.ComunitaryCard3Label.Location = new System.Drawing.Point(251, 119);
             this.ComunitaryCard3Label.Name = "ComunitaryCard3Label";
             this.ComunitaryCard3Label.Size = new System.Drawing.Size(37, 16);
             this.ComunitaryCard3Label.TabIndex = 16;
@@ -326,7 +319,7 @@
             // ComunitaryCard2Label
             // 
             this.ComunitaryCard2Label.AutoSize = true;
-            this.ComunitaryCard2Label.Location = new System.Drawing.Point(233, 119);
+            this.ComunitaryCard2Label.Location = new System.Drawing.Point(209, 119);
             this.ComunitaryCard2Label.Name = "ComunitaryCard2Label";
             this.ComunitaryCard2Label.Size = new System.Drawing.Size(37, 16);
             this.ComunitaryCard2Label.TabIndex = 15;
@@ -336,7 +329,7 @@
             // CominitaryCard1Label
             // 
             this.CominitaryCard1Label.AutoSize = true;
-            this.CominitaryCard1Label.Location = new System.Drawing.Point(190, 119);
+            this.CominitaryCard1Label.Location = new System.Drawing.Point(166, 119);
             this.CominitaryCard1Label.Name = "CominitaryCard1Label";
             this.CominitaryCard1Label.Size = new System.Drawing.Size(37, 16);
             this.CominitaryCard1Label.TabIndex = 14;
@@ -346,7 +339,7 @@
             // ComunitaryCardsLabel
             // 
             this.ComunitaryCardsLabel.AutoSize = true;
-            this.ComunitaryCardsLabel.Location = new System.Drawing.Point(227, 103);
+            this.ComunitaryCardsLabel.Location = new System.Drawing.Point(203, 103);
             this.ComunitaryCardsLabel.Name = "ComunitaryCardsLabel";
             this.ComunitaryCardsLabel.Size = new System.Drawing.Size(125, 16);
             this.ComunitaryCardsLabel.TabIndex = 13;
@@ -355,7 +348,7 @@
             // HandCard2Label
             // 
             this.HandCard2Label.AutoSize = true;
-            this.HandCard2Label.Location = new System.Drawing.Point(315, 39);
+            this.HandCard2Label.Location = new System.Drawing.Point(209, 39);
             this.HandCard2Label.Name = "HandCard2Label";
             this.HandCard2Label.Size = new System.Drawing.Size(37, 16);
             this.HandCard2Label.TabIndex = 12;
@@ -364,7 +357,7 @@
             // HandCard1Label
             // 
             this.HandCard1Label.AutoSize = true;
-            this.HandCard1Label.Location = new System.Drawing.Point(272, 39);
+            this.HandCard1Label.Location = new System.Drawing.Point(166, 39);
             this.HandCard1Label.Name = "HandCard1Label";
             this.HandCard1Label.Size = new System.Drawing.Size(37, 16);
             this.HandCard1Label.TabIndex = 11;
@@ -373,7 +366,7 @@
             // HandCardsLabel
             // 
             this.HandCardsLabel.AutoSize = true;
-            this.HandCardsLabel.Location = new System.Drawing.Point(268, 21);
+            this.HandCardsLabel.Location = new System.Drawing.Point(162, 21);
             this.HandCardsLabel.Name = "HandCardsLabel";
             this.HandCardsLabel.Size = new System.Drawing.Size(84, 16);
             this.HandCardsLabel.TabIndex = 10;
@@ -470,15 +463,31 @@
             this.Player0Label.TabIndex = 0;
             this.Player0Label.Text = "Me:";
             // 
+            // handProbabilitiesLabel
+            // 
+            this.handProbabilitiesLabel.AutoSize = true;
+            this.handProbabilitiesLabel.Location = new System.Drawing.Point(251, 21);
+            this.handProbabilitiesLabel.Name = "handProbabilitiesLabel";
+            this.handProbabilitiesLabel.Size = new System.Drawing.Size(128, 16);
+            this.handProbabilitiesLabel.TabIndex = 26;
+            this.handProbabilitiesLabel.Text = "Hand probabilities";
+            // 
+            // handProbLabel
+            // 
+            this.handProbLabel.AutoSize = true;
+            this.handProbLabel.Location = new System.Drawing.Point(291, 39);
+            this.handProbLabel.Name = "handProbLabel";
+            this.handProbLabel.Size = new System.Drawing.Size(0, 16);
+            this.handProbLabel.TabIndex = 27;
+            // 
             // Testing
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(766, 270);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.captureAll);
+            this.Controls.Add(this.RunAgentButton);
             this.Controls.Add(this.txtMessage);
-            this.Controls.Add(this.buttonCaptureWindowFrame);
             this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("Lucida Sans", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MainMenuStrip = this.menuStrip1;
@@ -503,7 +512,6 @@
 
         #endregion
 
-        private System.Windows.Forms.Button buttonCaptureWindowFrame;
         private System.Windows.Forms.TextBox txtMessage;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
@@ -516,7 +524,7 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem playersStacksToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem bottonsToolStripMenuItem;
-        private System.Windows.Forms.Button captureAll;
+        private System.Windows.Forms.Button RunAgentButton;
         private System.Windows.Forms.ToolStripMenuItem dealerChipPositionsToolStripMenuItem;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label Player1Label;
@@ -545,6 +553,8 @@
         private System.Windows.Forms.PictureBox CC1pictureBox;
         private System.Windows.Forms.PictureBox HC2pictureBox;
         private System.Windows.Forms.PictureBox HC1pictureBox;
+        private System.Windows.Forms.Label handProbLabel;
+        private System.Windows.Forms.Label handProbabilitiesLabel;
     }
 }
 

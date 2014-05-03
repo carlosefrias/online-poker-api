@@ -419,20 +419,23 @@ namespace PokerAPI
         public Image<Bgr, Byte> cropImage(Image<Bgr, Byte> img, MCvBox2D cropBox)
         {
             Image<Bgr, Byte> image = null;
-            try
+            do
             {
-                Rectangle cropArea = new Rectangle((int)(cropBox.center.X - cropBox.size.Width / 2), (int)(cropBox.center.Y - cropBox.size.Height / 2), (int)cropBox.size.Width, (int)cropBox.size.Height);
-                Bitmap bmpImage = img.ToBitmap();
-                Bitmap bmpCrop;
-                bmpCrop = bmpImage.Clone(cropArea, bmpImage.PixelFormat);
-                image = new Image<Bgr, Byte>(bmpCrop);
-                bmpCrop.Dispose();
-                bmpImage.Dispose();
-            }
-            catch (Exception e) 
-            {
-                Console.WriteLine("Execpção: OutOfMemoryException");
-            }
+                try
+                {
+                    Rectangle cropArea = new Rectangle((int)(cropBox.center.X - cropBox.size.Width / 2), (int)(cropBox.center.Y - cropBox.size.Height / 2), (int)cropBox.size.Width, (int)cropBox.size.Height);
+                    Bitmap bmpImage = img.ToBitmap();
+                    Bitmap bmpCrop;
+                    bmpCrop = bmpImage.Clone(cropArea, bmpImage.PixelFormat);
+                    image = new Image<Bgr, Byte>(bmpCrop);
+                    bmpCrop.Dispose();
+                    bmpImage.Dispose();
+                }
+                catch (Exception e)
+                {
+                    //Console.WriteLine("Execpção: OutOfMemoryException");
+                }
+            } while (image == null);
             return image;
         }
         /// <summary>
@@ -459,6 +462,10 @@ namespace PokerAPI
                     else if (recong[0].Contains("DeFora"))
                     {
                         if (DEBUG) Console.WriteLine("Player " + player + ": " + "De Fora");
+                        playerStacks[player] = -1;
+                    }else if(recong[0].Contains("azio")){
+                        if (DEBUG) Console.WriteLine("Player " + player + ": " + "Lugar vazio");
+                        playerStacks[player] = -2;
                     }
                     else
                     {
@@ -498,6 +505,8 @@ namespace PokerAPI
             retorno[1] = tess.GetText();
             retorno[0] = clean(retorno[0]);
             retorno[1] = clean(retorno[1]);
+            //Console.WriteLine("XXXXX: " + retorno[0]);
+            //Console.WriteLine("YYYYY: " + retorno[1]);
             return retorno;
         }
         private string clean(string s) 
