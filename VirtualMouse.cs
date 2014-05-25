@@ -28,8 +28,8 @@ namespace MouseManipulator
             MOUSEEVENTF_RIGHTUP = 0x0010, MOUSEEVENTF_MIDDLEDOWN = 0x0020, MOUSEEVENTF_MIDDLEUP = 0x0040, MOUSEEVENTF_ABSOLUTE = 0x8000;
         private Point position;
         private Rectangle[] buttons = new Rectangle[8];
-
-        Point TopLeftCorner;
+        private Point TopLeftCorner;
+        private RECT pRect;
         /*
          * 0 - Fold button
          * 1 - Call button
@@ -46,12 +46,14 @@ namespace MouseManipulator
         public VirtualMouse1(IntPtr hWnd) 
         {
             position = new Point(System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y);
-            RECT pRect;
             //Get coordinates relative to window
             GetWindowRect(hWnd, out pRect);
             TopLeftCorner = new Point(pRect.Left, pRect.Top);
-            position.X += TopLeftCorner.X;
-            position.Y += TopLeftCorner.Y;
+            loadButtonPositions();
+        }
+        public VirtualMouse1() 
+        {
+            TopLeftCorner = new Point(0, 0);
             loadButtonPositions();
         }
         public void fold() 
@@ -76,7 +78,7 @@ namespace MouseManipulator
             MoveToBezierCurve(x, y);
             Thread.Sleep(200);
             doubleClick();
-            Thread.Sleep(1000);
+            Thread.Sleep(300);
             SendKeys.Send("" + value);
             raise();
         }
@@ -113,6 +115,26 @@ namespace MouseManipulator
             int y = (int)rn.NextDouble(button.Y, button.Y + button.Height);
             MoveToBezierCurve(x, y);
             LeftClick();           
+        }
+        public void addChips(bool addChips) 
+        {
+            if (addChips)
+            {
+                Rectangle rect = new Rectangle(364, 392, 167, 14);
+                RandomNumbers rn = new RandomNumbers((int)DateTime.Now.Ticks);
+                int x = (int)rn.NextDouble(rect.X, rect.X + rect.Width);
+                int y = (int)rn.NextDouble(rect.Y, rect.Y + rect.Height);
+                MoveToBezierCurve(x, y);
+                LeftClick();
+            }
+        }
+        public void moveToRamdomPlace()
+        {
+            RandomNumbers rn = new RandomNumbers((int)DateTime.Now.Ticks);
+            int x = (int) rn.NextDouble(pRect.Left, pRect.Right);
+            int y = (int) rn.NextDouble(pRect.Bottom, pRect.Top);
+            Thread.Sleep((int)(rn.NextDouble(0.0, 1.0) * 1000));
+            MoveToBezierCurve(x, y);
         }
         /// <summary>
         /// Method that loads from disk the position of all the buttons
@@ -351,6 +373,11 @@ namespace MouseManipulator
         {
             mouse_event(MOUSEEVENTF_RIGHTUP, System.Windows.Forms.Control.MousePosition.X, System.Windows.Forms.Control.MousePosition.Y, 0, 0);
         }
+        public Rectangle[] getButtonsRectangles() 
+        {
+            return this.buttons;
+        }
+
     }
     public class RandomNumbers : Random
     {

@@ -43,6 +43,8 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RunAgentButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.handProbLabel = new System.Windows.Forms.Label();
+            this.handProbabilitiesLabel = new System.Windows.Forms.Label();
             this.CC5pictureBox = new System.Windows.Forms.PictureBox();
             this.CC4pictureBox = new System.Windows.Forms.PictureBox();
             this.CC3pictureBox = new System.Windows.Forms.PictureBox();
@@ -69,8 +71,9 @@
             this.Player2Label = new System.Windows.Forms.Label();
             this.Player1Label = new System.Windows.Forms.Label();
             this.Player0Label = new System.Windows.Forms.Label();
-            this.handProbabilitiesLabel = new System.Windows.Forms.Label();
-            this.handProbLabel = new System.Windows.Forms.Label();
+            this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.showStatsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteStatsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CC5pictureBox)).BeginInit();
@@ -98,6 +101,7 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.configureToolStripMenuItem,
+            this.statsToolStripMenuItem,
             this.aboutToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -232,6 +236,23 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(396, 191);
             this.panel1.TabIndex = 9;
+            // 
+            // handProbLabel
+            // 
+            this.handProbLabel.AutoSize = true;
+            this.handProbLabel.Location = new System.Drawing.Point(291, 39);
+            this.handProbLabel.Name = "handProbLabel";
+            this.handProbLabel.Size = new System.Drawing.Size(0, 16);
+            this.handProbLabel.TabIndex = 27;
+            // 
+            // handProbabilitiesLabel
+            // 
+            this.handProbabilitiesLabel.AutoSize = true;
+            this.handProbabilitiesLabel.Location = new System.Drawing.Point(251, 21);
+            this.handProbabilitiesLabel.Name = "handProbabilitiesLabel";
+            this.handProbabilitiesLabel.Size = new System.Drawing.Size(128, 16);
+            this.handProbabilitiesLabel.TabIndex = 26;
+            this.handProbabilitiesLabel.Text = "Hand probabilities";
             // 
             // CC5pictureBox
             // 
@@ -463,22 +484,28 @@
             this.Player0Label.TabIndex = 0;
             this.Player0Label.Text = "Me:";
             // 
-            // handProbabilitiesLabel
+            // statsToolStripMenuItem
             // 
-            this.handProbabilitiesLabel.AutoSize = true;
-            this.handProbabilitiesLabel.Location = new System.Drawing.Point(251, 21);
-            this.handProbabilitiesLabel.Name = "handProbabilitiesLabel";
-            this.handProbabilitiesLabel.Size = new System.Drawing.Size(128, 16);
-            this.handProbabilitiesLabel.TabIndex = 26;
-            this.handProbabilitiesLabel.Text = "Hand probabilities";
+            this.statsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showStatsToolStripMenuItem,
+            this.deleteStatsToolStripMenuItem});
+            this.statsToolStripMenuItem.Name = "statsToolStripMenuItem";
+            this.statsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.statsToolStripMenuItem.Text = "Stats";
             // 
-            // handProbLabel
+            // showStatsToolStripMenuItem
             // 
-            this.handProbLabel.AutoSize = true;
-            this.handProbLabel.Location = new System.Drawing.Point(291, 39);
-            this.handProbLabel.Name = "handProbLabel";
-            this.handProbLabel.Size = new System.Drawing.Size(0, 16);
-            this.handProbLabel.TabIndex = 27;
+            this.showStatsToolStripMenuItem.Name = "showStatsToolStripMenuItem";
+            this.showStatsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.showStatsToolStripMenuItem.Text = "Show stats";
+            this.showStatsToolStripMenuItem.Click += new System.EventHandler(this.showStatsToolStripMenuItem_Click);
+            // 
+            // deleteStatsToolStripMenuItem
+            // 
+            this.deleteStatsToolStripMenuItem.Name = "deleteStatsToolStripMenuItem";
+            this.deleteStatsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.deleteStatsToolStripMenuItem.Text = "Delete stats";
+            this.deleteStatsToolStripMenuItem.Click += new System.EventHandler(this.deleteStatsToolStripMenuItem_Click);
             // 
             // Testing
             // 
@@ -493,6 +520,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Testing";
             this.Text = "Calculadora";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Testing_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -555,6 +583,9 @@
         private System.Windows.Forms.PictureBox HC1pictureBox;
         private System.Windows.Forms.Label handProbLabel;
         private System.Windows.Forms.Label handProbabilitiesLabel;
+        private System.Windows.Forms.ToolStripMenuItem statsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showStatsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteStatsToolStripMenuItem;
     }
 }
 

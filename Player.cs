@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PokerAPI
 {
-    class Player
+    public class Player
     {
         public enum State {onGame, outGame, allIn}
         public enum Move { call, raise, fold}

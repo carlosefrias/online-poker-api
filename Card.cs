@@ -11,7 +11,7 @@ namespace PokerAPI
     /// <summary>
     /// Class that represents a playing card
     /// </summary>
-    class Card
+    public class Card
     {
         /// <summary>
         /// Ranks for the playing cards

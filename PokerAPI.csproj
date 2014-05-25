@@ -65,6 +65,10 @@
     <Reference Include="PokerLib">
       <HintPath>..\..\..\..\..\Dropbox\Carlos Frias\LIACC Pokerlib\liacc poker lib\PokerLib.dll</HintPath>
     </Reference>
+    <Reference Include="SQLite.NET, Version=0.21.1869.3794, Culture=neutral, PublicKeyToken=c273bd375e695f9c">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\SQLite.NET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -80,11 +84,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Agent\Agent.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="CardDetector.cs" />
     <Compile Include="Configure.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="database\GameStats.cs" />
+    <Compile Include="database\SQLiteDatabase.cs" />
     <Compile Include="Example.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

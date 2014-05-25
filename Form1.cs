@@ -21,6 +21,10 @@ using LIACC.Poker.Cards;
 using LIACC.Poker.Rules;
 using Action = LIACC.Poker.Action;
 
+
+
+public delegate void LinkToEventHandler(PokerAPI.CardDetector cd, PokerAPI.Player[] players, double probabilities, bool myTurn, IntPtr hWnd, Image<Bgr, byte> img);
+    
 namespace PokerAPI
 {
     public partial class Testing : Form
@@ -36,6 +40,13 @@ namespace PokerAPI
         private Player[] players = new Player[9];
         private Random random;
         private double probabilties = 0.0;
+        private static Thread agentThread;
+
+        ////////
+        private Agent.Agent agent;
+        public static event LinkToEventHandler Evt;
+        private static bool agentRunning = true;
+        ////////
 
         public Testing()
         {
@@ -60,16 +71,22 @@ namespace PokerAPI
         {
             Application.Idle += processFrameAndUpdateGUI;
         }
-        private void Form1_FormClosed(Object sender, FormClosedEventArgs e) 
+        private void Form1_FormClosed(Object sender, FormClosedEventArgs e)
         {
-            if (capture != null) 
+            if (capture != null)
             {
                 capture.Dispose();
             }
         }
-        private void processFrameAndUpdateGUI(Object sender, EventArgs args) {
+        /// <summary>
+        /// Method that performs the update of the graphical user interface
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void processFrameAndUpdateGUI(Object sender, EventArgs args)
+        {
             string stringplayer;
-            for (int i = 0; i < playersStackLabel.Length; i++) 
+            for (int i = 0; i < playersStackLabel.Length; i++)
             {
                 if (i != 0)
                 {
@@ -77,23 +94,26 @@ namespace PokerAPI
                 }
                 else
                     stringplayer = "Me: ";
-                playersStackLabel[i].Text = stringplayer + players[i].getStack();
+                if (players[i].getStack() >= 0)
+                    playersStackLabel[i].Text = stringplayer + players[i].getStack();
+                else
+                    playersStackLabel[i].Text = stringplayer + "OUT";
             }
             List<Card> holeCards = cd.getHoleCards();
-            if (holeCards.ToArray().Length == 2)
+            if (holeCards.Count == 2)
             {
                 HandCard1Label.Text = holeCards.ElementAt(0).toStringShort();
                 HC1pictureBox.Image = holeCards.ElementAt(0).cornerTemplate.ToBitmap();
                 HandCard2Label.Text = holeCards.ElementAt(1).toStringShort();
                 HC2pictureBox.Image = holeCards.ElementAt(1).cornerTemplate.ToBitmap();
             }
-            else 
+            else
             {
                 HandCard1Label.Text = "HC1";
                 HandCard2Label.Text = "HC2";
             }
             List<Card> CCards = cd.getComunitaryCards();
-            int number = CCards.ToArray().Length;
+            int number = CCards.Count;
             if (number >= 3)
             {
                 CominitaryCard1Label.Text = CCards.ElementAt(0).toStringShort();
@@ -101,16 +121,16 @@ namespace PokerAPI
                 ComunitaryCard2Label.Text = CCards.ElementAt(1).toStringShort();
                 CC2pictureBox.Image = CCards.ElementAt(1).cornerTemplate.ToBitmap();
                 ComunitaryCard3Label.Text = CCards.ElementAt(2).toStringShort();
-                CC3pictureBox.Image = CCards.ElementAt(2).cornerTemplate.ToBitmap();                
-                if(number == 3)
+                CC3pictureBox.Image = CCards.ElementAt(2).cornerTemplate.ToBitmap();
+                if (number == 3)
                 {
                     ComunitaryCard4label.Text = "CC4";
                     CC4pictureBox.Image = null;
                     ComunitaryCard5.Text = "CC5";
                     CC5pictureBox.Image = null;
                 }
-                if (number == 4) 
-                { 
+                if (number == 4)
+                {
                     ComunitaryCard4label.Text = CCards.ElementAt(3).toStringShort();
                     CC4pictureBox.Image = CCards.ElementAt(3).cornerTemplate.ToBitmap();
                     ComunitaryCard5.Text = "CC5";
@@ -122,7 +142,7 @@ namespace PokerAPI
                     CC5pictureBox.Image = CCards.ElementAt(4).cornerTemplate.ToBitmap();
                 }
             }
-            else 
+            else
             {
                 CominitaryCard1Label.Text = "CC1";
                 CC1pictureBox.Image = null;
@@ -135,7 +155,7 @@ namespace PokerAPI
                 ComunitaryCard5.Text = "CC5";
                 CC5pictureBox.Image = null;
             }
-            handProbLabel.Text = "" + probabilties;
+            handProbLabel.Text = "" + probabilties;            
         }
         /// <summary>
         /// Handler for the button click events
@@ -162,7 +182,7 @@ namespace PokerAPI
             }
             else imgOriginal = new Image<Bgr, byte>("Captures/img1.png");
             Image<Bgr, byte> img = imgOriginal.Clone();
-            if (img.Size != new Size(1016,728))
+            if (img.Size != new Size(1016, 728))
             {
                 img = img.Resize(1016, 728, INTER.CV_INTER_CUBIC);
             }
@@ -171,7 +191,7 @@ namespace PokerAPI
             Console.WriteLine(cd.findDealer(img));
             //ibOriginal.Image = imgOriginal;
             txtMessage.Text = "";
-            foreach(Card card in cd.getComunitaryCards())
+            foreach (Card card in cd.getComunitaryCards())
             {
                 txtMessage.AppendText(card.ToString() + ";");
             }
@@ -192,7 +212,7 @@ namespace PokerAPI
         /// <param name="e"></param>
         private void ReadTextButton_Click(object sender, EventArgs e)
         {
-            VirtualMouse1 vr = new VirtualMouse1(hWnd);
+            //VirtualMouse1 vr = new VirtualMouse1(hWnd);
             //vr.fold();
             //vr.call();
             //vr.raise();
@@ -219,7 +239,11 @@ namespace PokerAPI
             }
             return hWnd;
         }
-
+        /// <summary>
+        /// Method that allows to select and save to disk the region containing the board card region
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tableCardsRegionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PictureBox pictureBox = new PictureBox();
@@ -231,7 +255,11 @@ namespace PokerAPI
             form.Size = pictureBox.Size;
             form.ShowDialog();
         }
-
+        /// <summary>
+        /// Method for the open menu item 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Create an instance of the open file dialog box.
@@ -253,7 +281,11 @@ namespace PokerAPI
                 //imgOriginal = new Image<Bgr, Byte>(ibOriginal.Image.Bitmap);
             }
         }
-
+        /// <summary>
+        /// Method that allows the selection of the hole card position of every player
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void holeCardsRegionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PictureBox pictureBox = new PictureBox();
@@ -265,7 +297,11 @@ namespace PokerAPI
             form.Size = pictureBox.Size;
             form.ShowDialog();
         }
-
+        /// <summary>
+        /// Method that allows the selection of the players stacks regions
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void playersStacksToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PictureBox pictureBox = new PictureBox();
@@ -277,7 +313,11 @@ namespace PokerAPI
             form.Size = pictureBox.Size;
             form.ShowDialog();
         }
-
+        /// <summary>
+        /// Method that allows the selection of the buttons positions
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bottonsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PictureBox pictureBox = new PictureBox();
@@ -289,16 +329,25 @@ namespace PokerAPI
             form.Size = pictureBox.Size;
             form.ShowDialog();
         }
-
+        /// <summary>
+        /// Method that starts the agent
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void runAgent_Click(object sender, EventArgs e)
         {
-            Thread oThread = new Thread(new ThreadStart(this.RunThread));
-            oThread.Start();
+            agentThread = new Thread(new ThreadStart(this.RunThread));
+            agentThread.IsBackground = true;
+            agentThread.Start();
+            RunAgentButton.Enabled = false;
         }
-
-        private Image<Bgr, Byte> captureImage() 
+        /// <summary>
+        /// Function that captures the image of the poker stars window
+        /// </summary>
+        /// <returns></returns>
+        private Image<Bgr, Byte> captureImage()
         {
-            Image<Bgr, Byte> img = new Image<Bgr, byte>(new Size(1016,728));
+            Image<Bgr, Byte> img = new Image<Bgr, byte>(new Size(1016, 728));
             //Oppening the Poker holdem window...
             hWnd = WinGetHandle("No Limit Hold'em");
             try
@@ -314,7 +363,11 @@ namespace PokerAPI
             }
             return img;
         }
-
+        /// <summary>
+        /// Method that allows the selection the dealer position for every player
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dealerChipPositionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             PictureBox pictureBox = new PictureBox();
@@ -326,18 +379,27 @@ namespace PokerAPI
             form.Size = pictureBox.Size;
             form.ShowDialog();
         }
-        private void printPlayerStacks(int[] players) 
+        /// <summary>
+        /// Method that prints all player stacks
+        /// </summary>
+        /// <param name="players"></param>
+        private void printPlayerStacks(int[] players)
         {
             Console.Write("{");
-            for(int i = 0; i < players.Length - 1; i++)
+            for (int i = 0; i < players.Length - 1; i++)
             {
                 Console.Write("" + players[i] + ",");
             }
             Console.Write("" + players[players.Length - 1] + "}\n");
         }
-        private int printState(int cardNumber) 
+        /// <summary>
+        /// Method that prints the state of the game
+        /// </summary>
+        /// <param name="cardNumber"></param>
+        /// <returns></returns>
+        private int printState(int cardNumber)
         {
-            switch (cardNumber) 
+            switch (cardNumber)
             {
                 case 0:
                     Console.WriteLine("Estado: Pre-flop");
@@ -359,6 +421,11 @@ namespace PokerAPI
                     return -1;
             }
         }
+        /// <summary>
+        /// Method for the save menu item
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             /*
@@ -379,20 +446,27 @@ namespace PokerAPI
                 }
             }*/
         }
-
-        // This method that will be called when the thread is started
+        /// <summary>
+        /// Method for the agent Thread
+        /// </summary>
         public void RunThread()
         {
+            agent = new Agent.Agent("Poker genius!!!");
+            List<PokerAPI.Card> holeCards = cd.getHoleCards();
+            List<PokerAPI.Card> boardCards = cd.getComunitaryCards();
+            Evt += agent.AgentEventHandler;
+
+            int startValue = 0, endValue = 0;
             //Importante!!!!!! Inicializar o random apenas uma vez em toda a aplicação!!!
             random = new Random();
 
             bool myTurn = false, first = true, newGame = false;
             int dealer = -1, secondCount = 0, estado = -1, lastPlayerToMove = 0;
             Game game = new Game();
-            MatchState matchState = new MatchState(new State(1337, game), 0);
+            MatchState matchState = new MatchState(new State(0, game), 0);
             //See if changes ocurred in the players stacks
-            bool changes = false, runningAgent = false ;
-            while (true)
+            bool changes = false, runningAgent = false;
+            while (agentRunning)
             {
                 //Capturing the image
                 Image<Bgr, byte> img = captureImage();
@@ -401,7 +475,7 @@ namespace PokerAPI
                 {
                     //Detect the comunitary cards
                     cd.detectTableCards(img);
-                    estado = printState(cd.getComunitaryCards().ToArray().Length);
+                    estado = printState(cd.getComunitaryCards().Count);
                     cd.printComunitaryCards();
                     myTurn = cd.buttonsVisible(img);
                     dealer = cd.findDealer(img);
@@ -413,6 +487,9 @@ namespace PokerAPI
                     //Setting the player stacks in the player objects
                     players[i].setStack(cd.playerStacks[i]);
                 }
+                endValue = players[0].getStack();
+                if (first) startValue = endValue;
+
                 printPlayerStacks(cd.playerStacks);
                 //If it's not the first image
                 if (!first)
@@ -470,7 +547,7 @@ namespace PokerAPI
                             //if the dealer is the same, then it's not a new game
                             newGame = false;
                         }
-                        else 
+                        else
                         {
                             dealer = newdealer;
                             //if the dealer changed then it's a new game
@@ -483,8 +560,8 @@ namespace PokerAPI
                     cd.detectTableCards(img);
                     if (runningAgent)
                     {
-                        List<Card> holeCards = cd.getHoleCards();
-                        bool holeCardsConhecidas = (holeCards.ToArray().Length == 2);
+                        holeCards = cd.getHoleCards();
+                        bool holeCardsConhecidas = (holeCards.Count == 2);
                         //deves preencher informação sobre as cartas assim que as detetares:
                         //exemplo, as cartas do jogador 2 são Ás de ouros e Reis de Paus
                         byte[] fullHand;
@@ -496,26 +573,27 @@ namespace PokerAPI
                             fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1] };
                             holeCards1 = new byte[] { fullHand[0], fullHand[1] };
                             boardCards1 = new byte[] { };
-                        }
-                        List<Card> boardCards = cd.getComunitaryCards();
-                        if (boardCards.ToArray().Length >= 3 && holeCardsConhecidas)
-                        {
-                            matchState.state.BoardCards[0] = LIACC.Poker.Cards.Card.MakeCard(boardCards[0].toStringShort());
-                            matchState.state.BoardCards[1] = LIACC.Poker.Cards.Card.MakeCard(boardCards[1].toStringShort());
-                            matchState.state.BoardCards[2] = LIACC.Poker.Cards.Card.MakeCard(boardCards[2].toStringShort());
-                            fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2] };
-                            holeCards1 = new byte[] { fullHand[0], fullHand[1] };
-                            boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4] };
-                            if (boardCards.ToArray().Length == 4 || boardCards.ToArray().Length == 5)
+
+                            boardCards = cd.getComunitaryCards();
+                            if (boardCards.Count >= 3 && holeCardsConhecidas)
                             {
-                                matchState.state.BoardCards[3] = LIACC.Poker.Cards.Card.MakeCard(boardCards[3].toStringShort());
-                                fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2], matchState.state.BoardCards[3] };
-                                boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4], fullHand[5] };
-                                if (boardCards.ToArray().Length == 5)
+                                matchState.state.BoardCards[0] = LIACC.Poker.Cards.Card.MakeCard(boardCards[0].toStringShort());
+                                matchState.state.BoardCards[1] = LIACC.Poker.Cards.Card.MakeCard(boardCards[1].toStringShort());
+                                matchState.state.BoardCards[2] = LIACC.Poker.Cards.Card.MakeCard(boardCards[2].toStringShort());
+                                fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2] };
+                                holeCards1 = new byte[] { fullHand[0], fullHand[1] };
+                                boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4] };
+                                if (boardCards.Count == 4 || boardCards.Count == 5)
                                 {
-                                    matchState.state.BoardCards[4] = LIACC.Poker.Cards.Card.MakeCard(boardCards[4].toStringShort());
-                                    fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2], matchState.state.BoardCards[3], matchState.state.BoardCards[4] };
-                                    boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4], fullHand[5], fullHand[6] };
+                                    matchState.state.BoardCards[3] = LIACC.Poker.Cards.Card.MakeCard(boardCards[3].toStringShort());
+                                    fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2], matchState.state.BoardCards[3] };
+                                    boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4], fullHand[5] };
+                                    if (boardCards.Count == 5)
+                                    {
+                                        matchState.state.BoardCards[4] = LIACC.Poker.Cards.Card.MakeCard(boardCards[4].toStringShort());
+                                        fullHand = new byte[] { matchState.state.HoleCards[0, 0], matchState.state.HoleCards[0, 1], matchState.state.BoardCards[0], matchState.state.BoardCards[1], matchState.state.BoardCards[2], matchState.state.BoardCards[3], matchState.state.BoardCards[4] };
+                                        boardCards1 = new byte[] { fullHand[2], fullHand[3], fullHand[4], fullHand[5], fullHand[6] };
+                                    }
                                 }
                             }
                             Console.WriteLine("Probabilidade da mão: ");
@@ -525,8 +603,9 @@ namespace PokerAPI
                             Console.WriteLine(" é " + prob);
                         }
                     }
-                    int state = printState(cd.getComunitaryCards().ToArray().Length);
-                    if (state == 0 && estado != state) 
+                    int state = printState(cd.getComunitaryCards().Count);
+
+                    if (state == 0 && estado != state)
                     {
                         //If the actual state is pre-flop and the previous is different than pre-flop, then it's a new game
                         newGame = true;
@@ -535,33 +614,29 @@ namespace PokerAPI
                     cd.printComunitaryCards();
                     //Detect if it is my turn to play
                     myTurn = cd.buttonsVisible(img);
-                    //Here is Where the decision for the movements is taking plae
-                    if (myTurn)
-                    {
-                        Console.WriteLine("my turn to play");
-                        appendTextBox("my turn to play");
-                        VirtualMouse1 vr = new VirtualMouse1(hWnd);
-                        if (state == 0)
-                            vr.call();
-                        else
-                        {
-                            if (probabilties > 0.6)
-                            {
-                                vr.raise();
-                            }
-                            else if (probabilties > 0.3 && probabilties <= 0.6)
-                            {
-                                vr.call();
-                            }
-                            else vr.fold();
-                        }
-                    }
                 }
-                if (newGame) 
+                if (newGame)
                 {
+                    Console.WriteLine("?????: " + players[0].getStack());
+                    //Adding chips (not working)
+                    if (players[0].getStack() <= 0)
+                    {
+                        Console.WriteLine("A adicionar fichas");
+                        VirtualMouse1 vr = new VirtualMouse1(hWnd);
+                        Thread.Sleep(500);
+                        vr.addChips(true);
+                    }
+                    if (startValue >= 0)
+                    {
+                        if (endValue < 0) endValue = 0;
+                        database.GameStats gs = new database.GameStats(DateTime.Now.ToString(), startValue, endValue, endValue - startValue, 0);
+                        database.SQLiteDatabase.InsertGame(gs);
+                    }
+                    startValue = endValue;
+
                     Console.WriteLine("New Game started");
                     appendTextBox("New Game Started");
-                    
+
                     //Criar um objeto do tipo Game, no inicio de cada jogo, com as regras do jogo atual.
                     game = new Game();
                     //escolher tipo de jogo: limit ou nolimit
@@ -590,15 +665,17 @@ namespace PokerAPI
                     //escolher a estrutura de blinds por assento. 
                     //neste exemplo os jogadores na posicao 1 e na posicao 2 pagaram respetivamente 10 e 20.
                     //nota que os valores sao sempre inteiros (considera a representacao em centimos de dolar)
-                    game.Blind[1] = 10;//TODO: VER ISTO!!!!!!!!!!
-                    game.Blind[2] = 20;
+                    int[] blinds = cd.detectSmallAndBigBlind(hWnd);
+                    Console.WriteLine("SmallBlind: " + blinds[0] + " BigBlind: " + blinds[1]);
+                    game.Blind[1] = blinds[0];
+                    game.Blind[2] = blinds[1];
                     //indicar qual dos jogadores é o primeiro a jogar em cada ronda.
                     //fiz uma função para auxiliar a atribuição para o no limit poker.
                     //neste caso o primeiro jogador seria o que está na posição 2.
                     game.FirstPlayer = GetFirstPlayerNoLimit(2, game.NumPlayers);
                     //preencher os valores iniciais de dinheiro de cada jogador. preencher em centimos
                     //jogador 0 tem 10 euros, jogador 1 tem 15 euros, jogador 2 tem 5 euros, jogador 3 tem 9.50 e jogador 4 tem 2 euros
-                    game.Stack = new[] {players[0].getStack(), players[1].getStack(), players[2].getStack(), players[3].getStack(), players[4].getStack(), players[5].getStack(), players[6].getStack(), players[7].getStack(), players[8].getStack()};
+                    game.Stack = new[] { players[0].getStack(), players[1].getStack(), players[2].getStack(), players[3].getStack(), players[4].getStack(), players[5].getStack(), players[6].getStack(), players[7].getStack(), players[8].getStack() };
 
                     //Inicar um state para o jogo. O argumento handid (1337) é só um identificador para o estado, podes colocar o que quiseres
                     //o argumento viewingPlayer (2) indica a posição na mesa do teu bot
@@ -620,7 +697,7 @@ namespace PokerAPI
                     secondCount = 0;
                     changes = true;
                 }
-                else 
+                else
                 {
                     changes = false;
                 }
@@ -632,19 +709,27 @@ namespace PokerAPI
                 {
                     oldValues[i] = cd.playerStacks[i];
                 }
-                //Dipose de image
+                //Sending the event to the agent
+                if (Evt != null)
+                {
+                    Evt(cd, players, probabilties, myTurn, hWnd, img);
+                }
+                //Dipose the image
                 img.Dispose();
             }
         }
 
-        private void appendTextBox(string msg) 
+        private void appendTextBox(string msg)
         {
-            if (InvokeRequired)
+            try
             {
-                this.Invoke(new Action<string>(appendTextBox), new object[] { msg });
-                return;
-            }
-            txtMessage.AppendText(msg+"\n");
+                if (InvokeRequired)
+                {
+                    this.Invoke(new Action<string>(appendTextBox), new object[] { msg });
+                    return;
+                }
+                    txtMessage.AppendText(msg + "\n");
+            }catch (ObjectDisposedException e) { }
         }
 
         static byte[] GetFirstPlayerNoLimit(byte seat, byte numPlayers)
@@ -666,6 +751,61 @@ namespace PokerAPI
         private void label2_Click(object sender, EventArgs e)
         {
 
+        }
+        /// <summary>
+        /// Method for closing the application
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Testing_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            DialogResult dialog = MessageBox.Show("Do you realy want to close this application", "Exiting", MessageBoxButtons.YesNo);
+            if (dialog == DialogResult.Yes)
+            {
+                agentRunning = false;
+                try
+                {
+                    agentThread.Join();
+                }
+                catch (NullReferenceException) 
+                {
+                }
+                Application.Exit();
+            }
+            else if (dialog == DialogResult.No) 
+            {
+                e.Cancel = true;
+            }
+        }
+        /// <summary>
+        /// Method to show the stats os the poker agent in a message box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void showStatsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<database.GameStats> list = database.SQLiteDatabase.getALLGameRecords();
+            int num_games = list.Count;
+            int proffit = 0;
+            double winningsPerGame = 0.0;
+            foreach (database.GameStats gs in list) 
+            {
+                proffit += gs.getEarnedValue();
+            }
+            if (num_games != 0) winningsPerGame = proffit / (double)num_games;
+            MessageBox.Show("Number of games disputed: " + num_games
+                            + "\nTotal proffit: " + proffit
+                            + "\nWinnings per game: " + Math.Round(winningsPerGame)
+                            , "Stats");
+        }
+        /// <summary>
+        /// Method tha initializes the PokerAPIdatabase
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void deleteStatsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            database.SQLiteDatabase.initDB();
         }
     }
 }
